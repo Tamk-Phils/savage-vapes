@@ -25,7 +25,7 @@ export default function Footer() {
               </div>
               <div className="flex flex-col">
                 <span className="text-xl font-black tracking-wider font-display text-white">
-                  SAVAGE<span className="text-brand">VAPES</span>
+                  VAPE<span className="text-brand">WELL</span>
                 </span>
                 <span className="text-[9px] uppercase font-bold tracking-[0.25em] text-gray-500 -mt-1">
                   Australia
@@ -34,7 +34,7 @@ export default function Footer() {
             </Link>
 
             <p className="text-sm text-gray-400 leading-relaxed max-w-sm">
-              Savage Vapes Australia is your trusted online destination for authentic disposable vapes, pods, and starter kits. We provide genuine products with express, discreet delivery across Sydney, Melbourne, Brisbane, Perth, and nationwide.
+              Vape Well Australia is your trusted online destination for authentic disposable vapes, pods, and starter kits. We provide genuine products with express, discreet delivery across Sydney, Melbourne, Brisbane, Perth, and nationwide.
             </p>
 
             {/* Value Highlights */}
@@ -144,7 +144,7 @@ export default function Footer() {
             <ul className="space-y-2.5 text-sm">
               <li>
                 <Link href="/about" className="hover:text-brand transition-colors">
-                  About Savage Vapes
+                  About Vape Well
                 </Link>
               </li>
               <li>
@@ -171,7 +171,7 @@ export default function Footer() {
 
         {/* Bottom Strip */}
         <div className="mt-12 pt-8 border-t border-[#1a192e] flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-500">
-          <p>© {new Date().getFullYear()} Savage Vapes Australia. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Vape Well Australia. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <span>Discreet Shipping via AU Post</span>
             <span>18+ Age Restricted</span>

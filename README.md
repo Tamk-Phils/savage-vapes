@@ -1,4 +1,4 @@
-# Savage Vapes Australia 💨
+# Vape Well Australia 💨
 
 A modern, high-performance e-commerce website built with **Next.js (App Router)**, **TypeScript**, **Tailwind CSS**, and **Supabase**. Modelled directly after the client reference store (`https://primevapesaustralia.com`) with full brand customization, automated product extraction, real-time live search, slide-out cart drawer, and complete Australian checkout workflow.
 
@@ -17,7 +17,7 @@ A modern, high-performance e-commerce website built with **Next.js (App Router)*
   - **Slide-out Cart Drawer**: Animated mini-cart with quantity adjustments and a $150 AUD free shipping progress bar.
   - **Catalog & Filters**: Filter by 89 categories, brands, price tiers, and sort by popularity, rating, or price.
   - **Product Detail Pages**: Multi-image thumbnail switcher, specifications table, stock availability badge, flavor selectors, and related recommendations.
-  - **Full Cart & Checkout**: Coupon code support (`SAVAGE10`), PayID / Bank Transfer, Card, and Crypto payment methods.
+  - **Full Cart & Checkout**: Coupon code support (`VAPEWELL10`), PayID / Bank Transfer, Card, and Crypto payment methods.
   - **Verified Customer Reviews**: Community testimonials across major Australian capital cities and interactive review submission modal.
 
 ---

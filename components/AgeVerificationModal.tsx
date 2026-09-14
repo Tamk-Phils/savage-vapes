@@ -8,7 +8,7 @@ export default function AgeVerificationModal() {
 
   useEffect(() => {
     try {
-      const verified = localStorage.getItem('savage_age_verified');
+      const verified = localStorage.getItem('vapewell_age_verified') || localStorage.getItem('savage_age_verified');
       if (!verified) {
         setIsOpen(true);
       }
@@ -19,7 +19,7 @@ export default function AgeVerificationModal() {
 
   const handleConfirm = () => {
     try {
-      localStorage.setItem('savage_age_verified', 'true');
+      localStorage.setItem('vapewell_age_verified', 'true');
     } catch (e) {}
     setIsOpen(false);
   };
@@ -48,7 +48,7 @@ export default function AgeVerificationModal() {
         </h2>
 
         <p className="text-sm text-gray-600 leading-relaxed mb-6">
-          Under Australian law, vaping and nicotine products may only be sold to and consumed by individuals aged 18 years and older. Please verify your age to enter Savage Vapes.
+          Under Australian law, vaping and nicotine products may only be sold to and consumed by individuals aged 18 years and older. Please verify your age to enter Vape Well Australia.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

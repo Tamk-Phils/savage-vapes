@@ -9,7 +9,7 @@ export default function AboutPage() {
         <div className="text-center space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#45cab4]/15 border border-[#45cab4]/30 text-[#2b9685] text-xs font-bold uppercase tracking-wider">
             <Flame className="w-3.5 h-3.5" />
-            <span>About Savage Vapes Australia</span>
+            <span>About Vape Well Australia</span>
           </div>
           <h1 className="text-4xl sm:text-5xl font-black text-gray-900 font-display">
             Australia&apos;s Trusted Destination for Premium Vapes
@@ -28,7 +28,7 @@ export default function AboutPage() {
             Safe, Genuine & Effortless Access Across Australia
           </h2>
           <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-            At Savage Vapes Australia, our mission is clear: to provide Australians with the highest quality vape products from world-renowned manufacturers—ensuring authenticity, safety, satisfaction, and discreet doorstep delivery. We believe in providing adult vapers with reliable hardware without exorbitant markups or questionable counterfeit replicas.
+            At Vape Well Australia, our mission is clear: to provide Australians with the highest quality vape products from world-renowned manufacturers—ensuring authenticity, safety, satisfaction, and discreet doorstep delivery. We believe in providing adult vapers with reliable hardware without exorbitant markups or questionable counterfeit replicas.
           </p>
         </div>
 
@@ -38,7 +38,7 @@ export default function AboutPage() {
             Who We Are
           </h2>
           <p className="text-sm sm:text-base">
-            Savage Vapes Australia was founded with one goal in mind: solving the widespread frustration of counterfeit devices, slow postal times, and poor customer service in the Australian vape market. Today, we stand as one of Australia’s premier independent online vape networks.
+            Vape Well Australia was founded with one goal in mind: solving the widespread frustration of counterfeit devices, slow postal times, and poor customer service in the Australian vape market. Today, we stand as one of Australia’s premier independent online vape networks.
           </p>
           <p className="text-sm sm:text-base">
             We specialize in high-puff disposable vapes, refillable pod systems, and beginner-friendly starter kits. Through direct partnerships with leading brands including <strong className="text-gray-900">IGET, HQD, ALIBARBAR, VEIPUS, and RELX</strong>, we bypass intermediaries to bring fresh batches straight to your hands with certified anti-counterfeit scratch-off seals.

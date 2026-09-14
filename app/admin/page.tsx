@@ -96,7 +96,7 @@ export default function AdminDashboardPage() {
             Admin Overview & Metrics
           </h1>
           <p className="text-xs text-gray-500 mt-1">
-            Real-time management for Savage Vapes Australia store.
+            Real-time management for Vape Well Australia store.
           </p>
         </div>
 

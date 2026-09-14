@@ -6,11 +6,11 @@ import { Settings, Save, Download, ShieldCheck, Database } from 'lucide-react';
 export default function AdminSettingsPage() {
   const [saved, setSaved] = useState(false);
   const [settings, setSettings] = useState({
-    siteName: 'Savage Vapes Australia',
+    siteName: 'Vape Well Australia',
     freeShippingThreshold: 150,
     standardShippingFee: 15,
     expressShippingFee: 22,
-    supportEmail: 'support@savagevapes.com.au',
+    supportEmail: 'support@vapewellaustralia.com.au',
     supportPhone: '1300 000 000',
     bannerText: 'FREE EXPRESS SHIPPING on Australian orders over $150 | 100% Authentic Guaranteed',
   });

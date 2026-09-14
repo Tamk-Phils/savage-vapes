@@ -44,7 +44,7 @@ const initialReviews = [
     state: 'WA',
     rating: 5,
     date: '1 week ago',
-    comment: 'Express delivery to WA took only 2 business days. The Alibarbar 9000 puff flavour profile is unmatched. Excellent service and support from Savage Vapes.',
+    comment: 'Express delivery to WA took only 2 business days. The Alibarbar 9000 puff flavour profile is unmatched. Excellent service and support from Vape Well.',
     product: 'ALIBARBAR INGOT 9000',
     verified: true,
   },
@@ -123,7 +123,7 @@ export default function ReviewsPage() {
             What Our Customers Say
           </h1>
           <p className="text-base text-gray-600">
-            Read authentic reviews from verified adult vapers across Australia who trust Savage Vapes for their daily hardware and flavour needs.
+            Read authentic reviews from verified adult vapers across Australia who trust Vape Well for their daily hardware and flavour needs.
           </p>
 
           <div className="p-6 rounded-2xl bg-white border border-gray-200 shadow-sm inline-flex flex-col sm:flex-row items-center gap-6 mt-4">

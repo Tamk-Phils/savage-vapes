@@ -29,8 +29,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     try {
-      const localAuth = localStorage.getItem('savage_admin_auth');
-      const sessionAuth = sessionStorage.getItem('savage_admin_auth');
+      const localAuth = localStorage.getItem('vapewell_admin_auth') || localStorage.getItem('savage_admin_auth');
+      const sessionAuth = sessionStorage.getItem('vapewell_admin_auth') || sessionStorage.getItem('savage_admin_auth');
       if (localAuth === 'true' || sessionAuth === 'true') {
         setIsAuthenticated(true);
       }
@@ -40,21 +40,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     const clean = passcode.trim().toLowerCase();
-    // Accept: savage2026, admin123, admin, savage
-    if (clean === 'savage2026' || clean === 'admin123' || clean === 'admin' || clean === 'savage') {
+    // Accept: vapewell2026, vapewell, admin123, admin, savage2026, savage
+    if (clean === 'vapewell2026' || clean === 'vapewell' || clean === 'admin123' || clean === 'admin' || clean === 'savage2026' || clean === 'savage') {
       try {
-        localStorage.setItem('savage_admin_auth', 'true');
-        sessionStorage.setItem('savage_admin_auth', 'true');
+        localStorage.setItem('vapewell_admin_auth', 'true');
+        sessionStorage.setItem('vapewell_admin_auth', 'true');
       } catch (e) {}
       setIsAuthenticated(true);
       setErrorMsg('');
     } else {
-      setErrorMsg('Incorrect passcode. Please enter savage2026 or admin123');
+      setErrorMsg('Incorrect passcode. Please enter vapewell2026 or admin123');
     }
   };
 
   const handleLogout = () => {
     try {
+      localStorage.removeItem('vapewell_admin_auth');
+      sessionStorage.removeItem('vapewell_admin_auth');
       localStorage.removeItem('savage_admin_auth');
       sessionStorage.removeItem('savage_admin_auth');
     } catch (e) {}
@@ -72,7 +74,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
           <div className="space-y-1.5">
             <h1 className="text-2xl font-bold text-gray-900">
-              Savage Vapes Admin Portal
+              Vape Well Admin Portal
             </h1>
             <p className="text-xs text-gray-500">
               Enter administrator passcode to access store inventory, orders, and settings.
@@ -94,7 +96,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     setPasscode(e.target.value);
                     if (errorMsg) setErrorMsg('');
                   }}
-                  placeholder="Enter passcode (savage2026)"
+                  placeholder="Enter passcode (vapewell2026)"
                   className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 pr-10 text-sm text-gray-900 placeholder-gray-400 focus:border-[#45cab4] focus:ring-2 focus:ring-[#45cab4]/20 focus:outline-none transition-all"
                 />
                 <button
@@ -127,7 +129,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               href="/"
               className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-800 transition-colors"
             >
-              ← Return to Savage Vapes Store
+              ← Return to Vape Well Store
             </Link>
           </div>
         </div>
@@ -149,7 +151,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="md:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-2">
           <Flame className="w-6 h-6 text-[#45cab4]" />
-          <span className="font-bold text-gray-900 text-sm">SAVAGE ADMIN</span>
+          <span className="font-bold text-gray-900 text-sm">VAPE WELL ADMIN</span>
         </div>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -173,7 +175,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
             <div>
               <span className="text-base font-black tracking-wide text-gray-900 block">
-                SAVAGE<span className="text-[#45cab4]">VAPES</span>
+                VAPE<span className="text-[#45cab4]">WELL</span>
               </span>
               <span className="text-[10px] uppercase font-bold tracking-widest text-emerald-600">
                 ● Live Admin

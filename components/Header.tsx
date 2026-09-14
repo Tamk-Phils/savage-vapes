@@ -105,7 +105,7 @@ export default function Header() {
             </div>
             <div className="flex flex-col">
               <span className="text-xl sm:text-2xl font-bold font-display text-[#222222] tracking-tight group-hover:text-[#45cab4] transition-colors">
-                Savage Vape Australia
+                Vape Well Australia
               </span>
               <span className="text-[10px] text-gray-400 font-medium tracking-wider -mt-1 hidden sm:block">
                 Authentic Vapes & Pods

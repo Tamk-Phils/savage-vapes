@@ -441,7 +441,7 @@ export default function CheckoutPage() {
                   className="mt-1 w-4 h-4 rounded border-gray-400 text-[#45cab4] focus:ring-[#45cab4] accent-[#45cab4]"
                 />
                 <span className="text-xs sm:text-sm text-gray-700">
-                  <strong className="text-gray-900">I declare that I am 18 years of age or older</strong> and agree to the Savage Vapes Australia Terms of Service and Privacy Policy. I acknowledge that nicotine products are age-restricted in Australia.
+                  <strong className="text-gray-900">I declare that I am 18 years of age or older</strong> and agree to the Vape Well Australia Terms of Service and Privacy Policy. I acknowledge that nicotine products are age-restricted in Australia.
                 </span>
               </label>
             </div>

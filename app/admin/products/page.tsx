@@ -31,7 +31,7 @@ export default function AdminProductsPage() {
   // Form states for Add / Edit
   const [formData, setFormData] = useState({
     name: '',
-    brand: 'Savage',
+    brand: 'Vape Well',
     price: '',
     regular_price: '',
     sale_price: '',
@@ -130,7 +130,7 @@ export default function AdminProductsPage() {
         setIsAddModalOpen(false);
         setFormData({
           name: '',
-          brand: 'Savage',
+          brand: 'Vape Well',
           price: '',
           regular_price: '',
           sale_price: '',
@@ -220,7 +220,7 @@ export default function AdminProductsPage() {
           onClick={() => {
             setFormData({
               name: '',
-              brand: 'Savage',
+              brand: 'Vape Well',
               price: '',
               regular_price: '',
               sale_price: '',

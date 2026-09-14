@@ -129,7 +129,7 @@ export async function addProduct(product: Partial<Product>): Promise<Product> {
     name: product.name || 'New Product',
     slug: product.slug || slug,
     sku: product.sku || '',
-    brand: product.brand || 'Savage',
+    brand: product.brand || 'Vape Well',
     price: Number(product.price || 0),
     regular_price: Number(product.regular_price || product.price || 0),
     sale_price: product.sale_price ? Number(product.sale_price) : null,

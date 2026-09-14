@@ -32,11 +32,12 @@ export default function CartPage() {
 
   const handleApplyCoupon = (e: React.FormEvent) => {
     e.preventDefault();
-    if (couponCode.trim().toUpperCase() === 'SAVAGE10') {
+    const code = couponCode.trim().toUpperCase();
+    if (code === 'VAPEWELL10' || code === 'SAVAGE10') {
       setCouponApplied(true);
       setCouponError('');
     } else {
-      setCouponError('Invalid coupon code. Try SAVAGE10 for 10% off.');
+      setCouponError('Invalid coupon code. Try VAPEWELL10 for 10% off.');
     }
   };
 
@@ -235,7 +236,7 @@ export default function CartPage() {
 
                 {couponApplied && (
                   <div className="flex justify-between text-emerald-700 font-semibold">
-                    <span>Discount (SAVAGE10 - 10%)</span>
+                    <span>Discount (VAPEWELL10 - 10%)</span>
                     <span>-${discountAmount.toFixed(2)} AUD</span>
                   </div>
                 )}
@@ -258,7 +259,7 @@ export default function CartPage() {
                     type="text"
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value)}
-                    placeholder="Coupon code (e.g. SAVAGE10)"
+                    placeholder="Coupon code (e.g. VAPEWELL10)"
                     className="flex-1 bg-white border border-gray-300 rounded-xl px-3.5 py-2 text-xs text-gray-900 placeholder-gray-400 focus:border-[#45cab4] focus:outline-none"
                   />
                   <button

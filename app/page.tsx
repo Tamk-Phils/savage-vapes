@@ -103,7 +103,7 @@ export default async function HomePage() {
   const faqs = [
     {
       q: "Where can I buy vape kits online in Australia?",
-      a: "You can buy vape kits online in Australia from Savage Vape Australia. We offer a wide range of starter and advanced vape kits, ensuring you find the right device for your vaping needs, with fast and reliable shipping."
+      a: "You can buy vape kits online in Australia from Vape Well Australia. We offer a wide range of starter and advanced vape kits, ensuring you find the right device for your vaping needs, with fast and reliable shipping."
     },
     {
       q: "Do you sell vape coils and pods in Australia?",
@@ -111,7 +111,7 @@ export default async function HomePage() {
     },
     {
       q: "What are the best e-liquids in Australia?",
-      a: "The best e-liquids depend on your flavour preferences and device. At Savage Vape Australia, we carry a wide range of premium flavours, from classic tobacco and menthol to fruity and dessert options."
+      a: "The best e-liquids depend on your flavour preferences and device. At Vape Well Australia, we carry a wide range of premium flavours, from classic tobacco and menthol to fruity and dessert options."
     },
     {
       q: "Do you offer vape accessories in Australia?",
@@ -130,7 +130,7 @@ export default async function HomePage() {
       >
         <div className="max-w-4xl mx-auto space-y-5">
           <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold font-display tracking-tight text-white uppercase">
-            Savage Vapes Australia
+            Vape Well Australia
           </h1>
 
           {/* Cyan Divider line matching .elementor-divider-separator */}
@@ -159,7 +159,7 @@ export default async function HomePage() {
           </h1>
 
           <p className="text-sm text-gray-600 leading-relaxed max-w-4xl mx-auto">
-            Are you a vaper out of stock for your favorite vape flavor and is looking for legitimate place to source them from? Buy vapes online Australia cheap from <strong className="text-black">SAVAGE VAPES AUSTRALIA</strong> and discover our full range of <Link href="/shop?category=disposable-vapes" className="text-[#45cab4] hover:underline font-semibold">IGET vapes online Australia</Link>, disposable vapes, vape kits, replacement vape pods, coils e-liquids, and more to <Link href="/shop" className="text-[#45cab4] hover:underline font-semibold">buy online Australia</Link> and have the fastest shipping experience – All products are 100% authentic, with trusted and secure payment options and express shipping Australia-wide. <Link href="/shop?category=disposable-vapes" className="text-[#45cab4] hover:underline font-semibold">Buy Disposable vapes online Australia</Link> with <strong className="text-black">SAVAGE VAPES AUSTRALIA</strong> today and get <strong className="text-black">5%</strong> off your entire first order.
+            Are you a vaper out of stock for your favorite vape flavor and is looking for legitimate place to source them from? Buy vapes online Australia cheap from <strong className="text-black">VAPE WELL AUSTRALIA</strong> and discover our full range of <Link href="/shop?category=disposable-vapes" className="text-[#45cab4] hover:underline font-semibold">IGET vapes online Australia</Link>, disposable vapes, vape kits, replacement vape pods, coils e-liquids, and more to <Link href="/shop" className="text-[#45cab4] hover:underline font-semibold">buy online Australia</Link> and have the fastest shipping experience – All products are 100% authentic, with trusted and secure payment options and express shipping Australia-wide. <Link href="/shop?category=disposable-vapes" className="text-[#45cab4] hover:underline font-semibold">Buy Disposable vapes online Australia</Link> with <strong className="text-black">VAPE WELL AUSTRALIA</strong> today and get <strong className="text-black">5%</strong> off your entire first order.
           </p>
 
           <h2 className="text-xl sm:text-2xl font-bold text-[#3a3a3a] font-display pt-4">
@@ -198,7 +198,7 @@ export default async function HomePage() {
               BEST DISPOSABLE VAPES AUSTRALIA | IGET Vapes Online Australia
             </h2>
             <p className="text-sm text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              SAVAGE VAPES AUSTRALIA is the number one trusted online vape store to buy vapes online in Australia. Check out our wide range of authentic disposable vapes for sale in Australia.
+              VAPE WELL AUSTRALIA is the number one trusted online vape store to buy vapes online in Australia. Check out our wide range of authentic disposable vapes for sale in Australia.
             </p>
           </div>
 
@@ -329,7 +329,7 @@ export default async function HomePage() {
                 Vape Kits to Suit Any Style in Australia
               </h3>
               <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                Whether you prefer the simplicity of disposable vapes, portable pod systems, or high-wattage box mod kits, Savage Vapes Australia provides tailored solutions for every customer.
+                Whether you prefer the simplicity of disposable vapes, portable pod systems, or high-wattage box mod kits, Vape Well Australia provides tailored solutions for every customer.
               </p>
             </div>
 
@@ -434,7 +434,7 @@ export default async function HomePage() {
               WHO WE ARE?
             </h2>
             <p className="text-sm text-gray-600 leading-relaxed">
-              <strong className="text-black">SAVAGE VAPES AUSTRALIA</strong> is one of Australia’s leading vape networks, established in 2020. We specialize in bringing adult vapers the highest quality hardware from reputable manufacturers.
+              <strong className="text-black">VAPE WELL AUSTRALIA</strong> is one of Australia’s leading vape networks, established in 2020. We specialize in bringing adult vapers the highest quality hardware from reputable manufacturers.
             </p>
             <p className="text-sm text-gray-600 leading-relaxed">
               We focus on disposable vapes—easy to use, highly convenient, and in tune with modern vaping lifestyles. We partner with industry leaders like IGET, ALIBARBAR, BIMO, and RELX to deliver the latest, most reliable devices to our customers nationwide.

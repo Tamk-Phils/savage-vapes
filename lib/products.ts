@@ -430,7 +430,7 @@ const fallbackReviews: CustomerReview[] = [
     state: "QLD",
     rating: 5,
     date: "1 week ago",
-    comment: "First time ordering from Savage Vapes and the experience was smooth. Checkout was easy, shipping to Brisbane was reliable. Best prices around!",
+    comment: "First time ordering from Vape Well and the experience was smooth. Checkout was easy, shipping to Brisbane was reliable. Best prices around!",
     verified: true
   },
   {
@@ -494,7 +494,7 @@ export async function getReviews(): Promise<CustomerReview[]> {
 }
 
 export async function saveOrder(order: Partial<Order>): Promise<{ success: boolean; orderId: string; error?: string }> {
-  const orderId = 'SAVAGE-' + Math.random().toString(36).substring(2, 9).toUpperCase();
+  const orderId = 'VW-' + Math.random().toString(36).substring(2, 9).toUpperCase();
 
   if (isSupabaseConfigured() && supabase) {
     try {

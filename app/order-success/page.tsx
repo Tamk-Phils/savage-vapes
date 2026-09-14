@@ -10,7 +10,7 @@ interface OrderSuccessProps {
 
 export default async function OrderSuccessPage({ searchParams }: OrderSuccessProps) {
   const params = await searchParams;
-  const orderId = params.id || params.orderId || 'SAVAGE-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+  const orderId = params.id || params.orderId || 'VW-' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
   return (
     <div className="min-h-[75vh] flex items-center justify-center py-16 px-4 bg-[#f5f5f5] text-gray-800">

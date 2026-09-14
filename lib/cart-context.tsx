@@ -34,7 +34,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   // Load cart from localStorage on mount
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('savage_vapes_cart');
+      const saved = localStorage.getItem('vape_well_cart') || localStorage.getItem('savage_vapes_cart');
       if (saved) {
         setItems(JSON.parse(saved));
       }
@@ -48,7 +48,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isHydrated) {
       try {
-        localStorage.setItem('savage_vapes_cart', JSON.stringify(items));
+        localStorage.setItem('vape_well_cart', JSON.stringify(items));
       } catch (e) {
         console.warn('Could not save cart to localStorage', e);
       }
