@@ -44,7 +44,7 @@ create index if not exists idx_products_on_sale on products (on_sale);
 
 -- 3. ORDERS TABLE
 create table if not exists orders (
-  id uuid default uuid_generate_v4() primary key,
+  id text primary key default ('SAVAGE-' || upper(substr(md5(random()::text), 1, 7))),
   customer_name text not null,
   customer_email text not null,
   customer_phone text not null,
@@ -55,6 +55,7 @@ create table if not exists orders (
   total numeric(10, 2) not null,
   payment_method text not null,
   status text default 'pending' check (status in ('pending', 'processing', 'shipped', 'completed', 'cancelled')),
+  tracking_number text,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
@@ -77,21 +78,34 @@ alter table products enable row level security;
 alter table orders enable row level security;
 alter table reviews enable row level security;
 
--- Public can read categories and products
+-- Public and Admin Access Policies
 create policy "Allow public read access for categories" on categories
   for select using (true);
+
+create policy "Allow admin modify categories" on categories
+  for all using (true);
 
 create policy "Allow public read access for products" on products
   for select using (true);
 
+create policy "Allow admin modify products" on products
+  for all using (true);
+
 create policy "Allow public read access for reviews" on reviews
   for select using (true);
 
--- Public can insert orders
+create policy "Allow public review creation" on reviews
+  for insert with check (true);
+
 create policy "Allow public order creation" on orders
   for insert with check (true);
 
--- Public can submit reviews
-create policy "Allow public review creation" on reviews
-  for insert with check (true);
+create policy "Allow admin read orders" on orders
+  for select using (true);
+
+create policy "Allow admin update orders" on orders
+  for update using (true);
+
+create policy "Allow admin delete orders" on orders
+  for delete using (true);
 
