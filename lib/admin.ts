@@ -8,9 +8,14 @@ const ordersFile = path.join(dataDir, 'orders.json');
 const productsFile = path.join(dataDir, 'products.json');
 const categoriesFile = path.join(dataDir, 'categories.json');
 
-// Helper to safely read JSON
+// Helper to safely read JSON with serverless fallback
 function readJSON<T>(file: string, fallback: T): T {
   try {
+    const fileName = path.basename(file);
+    const tmpPath = path.join('/tmp', fileName);
+    if (fs.existsSync(tmpPath)) {
+      return JSON.parse(fs.readFileSync(tmpPath, 'utf-8'));
+    }
     if (fs.existsSync(file)) {
       return JSON.parse(fs.readFileSync(file, 'utf-8'));
     }
@@ -20,14 +25,21 @@ function readJSON<T>(file: string, fallback: T): T {
   return fallback;
 }
 
-// Helper to safely write JSON
+// Helper to safely write JSON with serverless fallback
 function writeJSON(file: string, data: any): boolean {
   try {
     fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
     return true;
   } catch (e) {
-    console.error(`Error writing ${file}:`, e);
-    return false;
+    try {
+      const fileName = path.basename(file);
+      const tmpPath = path.join('/tmp', fileName);
+      fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2), 'utf-8');
+      return true;
+    } catch (tmpErr) {
+      console.error(`Error writing ${file} and /tmp fallback:`, e, tmpErr);
+      return false;
+    }
   }
 }
 

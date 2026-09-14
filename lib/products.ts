@@ -12,9 +12,11 @@ function loadLocalData(): { products: Product[]; categories: ProductCategory[] }
   }
 
   try {
-    const dataDir = path.join(process.cwd(), 'data');
-    const prodFile = path.join(dataDir, 'products.json');
-    const catFile = path.join(dataDir, 'categories.json');
+    const tmpProd = path.join('/tmp', 'products.json');
+    const prodFile = fs.existsSync(tmpProd) ? tmpProd : path.join(process.cwd(), 'data', 'products.json');
+
+    const tmpCat = path.join('/tmp', 'categories.json');
+    const catFile = fs.existsSync(tmpCat) ? tmpCat : path.join(process.cwd(), 'data', 'categories.json');
 
     if (fs.existsSync(prodFile)) {
       const prodContent = fs.readFileSync(prodFile, 'utf-8');
@@ -474,11 +476,16 @@ export async function saveOrder(order: Partial<Order>): Promise<{ success: boole
     }
   }
 
-  // Save to local data/orders.json
+  // Save to local data/orders.json with /tmp serverless fallback
   try {
     const ordersFilePath = path.join(process.cwd(), 'data', 'orders.json');
+    const tmpOrdersPath = path.join('/tmp', 'orders.json');
+    const targetReadPath = fs.existsSync(tmpOrdersPath) ? tmpOrdersPath : ordersFilePath;
+
     let ordersList: any[] = [];
-    if (fs.existsSync(ordersFilePath)) {
+    if (fs.existsSync(targetReadPath)) {
+      ordersList = JSON.parse(fs.readFileSync(targetReadPath, 'utf-8'));
+    } else if (fs.existsSync(ordersFilePath)) {
       ordersList = JSON.parse(fs.readFileSync(ordersFilePath, 'utf-8'));
     }
     ordersList.unshift({
@@ -495,7 +502,11 @@ export async function saveOrder(order: Partial<Order>): Promise<{ success: boole
       status: 'pending',
       createdAt: new Date().toISOString()
     });
-    fs.writeFileSync(ordersFilePath, JSON.stringify(ordersList, null, 2), 'utf-8');
+    try {
+      fs.writeFileSync(ordersFilePath, JSON.stringify(ordersList, null, 2), 'utf-8');
+    } catch (writeErr) {
+      fs.writeFileSync(tmpOrdersPath, JSON.stringify(ordersList, null, 2), 'utf-8');
+    }
   } catch (err) {
     console.error('Failed to save order to local orders.json:', err);
   }
