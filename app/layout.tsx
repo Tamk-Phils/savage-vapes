@@ -5,6 +5,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import CartDrawer from '@/components/CartDrawer';
 import AgeVerificationModal from '@/components/AgeVerificationModal';
+import ServiceWorkerCleanup from '@/components/ServiceWorkerCleanup';
 
 export const metadata: Metadata = {
   title: 'Savage Vapes Australia - Buy Vapes Online Australia | Best Disposable Vape Store',
@@ -25,6 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col bg-[#f5f5f5] text-[#3a3a3a] antialiased selection:bg-[#45cab4] selection:text-black">
+        <ServiceWorkerCleanup />
         <CartProvider>
           <AgeVerificationModal />
           <Header />
