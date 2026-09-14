@@ -75,26 +75,47 @@ async function seed() {
     const rawProducts = JSON.parse(fs.readFileSync(productsPath, 'utf-8'));
     console.log(`💨 Seeding ${rawProducts.length} products in batches of 100...`);
 
-    const formattedProducts = rawProducts.map(p => ({
-      id: p.id,
-      name: p.name,
-      slug: p.slug,
-      sku: p.sku || '',
-      permalink: p.permalink || '',
-      brand: p.brand || 'Savage',
-      price: p.price,
-      regular_price: p.regular_price,
-      sale_price: p.sale_price,
-      on_sale: p.on_sale,
-      is_in_stock: p.is_in_stock,
-      categories: p.categories || [],
-      short_description: p.short_description || '',
-      description: p.description || '',
-      images: p.images || [],
-      attributes: p.attributes || [],
-      rating: p.rating || 5.0,
-      review_count: p.review_count || 0
-    }));
+    const formattedProducts = rawProducts.map(p => {
+      const catSet = new Set();
+      (p.categories || []).forEach(c => {
+        if (c) {
+          catSet.add(c);
+          catSet.add(c.toLowerCase());
+          catSet.add(c.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''));
+        }
+      });
+      (p.category_objects || []).forEach(co => {
+        if (co.name) {
+          catSet.add(co.name);
+          catSet.add(co.name.toLowerCase());
+        }
+        if (co.slug) {
+          catSet.add(co.slug);
+          catSet.add(co.slug.toLowerCase());
+        }
+      });
+
+      return {
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        sku: p.sku || '',
+        permalink: p.permalink || '',
+        brand: p.brand || 'Savage',
+        price: p.price,
+        regular_price: p.regular_price,
+        sale_price: p.sale_price,
+        on_sale: p.on_sale,
+        is_in_stock: p.is_in_stock,
+        categories: Array.from(catSet),
+        short_description: p.short_description || '',
+        description: p.description || '',
+        images: p.images || [],
+        attributes: p.attributes || [],
+        rating: p.rating || 5.0,
+        review_count: p.review_count || 0
+      };
+    });
 
     for (let i = 0; i < formattedProducts.length; i += 100) {
       const chunk = formattedProducts.slice(i, i + 100);

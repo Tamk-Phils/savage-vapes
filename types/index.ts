@@ -12,6 +12,7 @@ export interface ProductCategory {
   link?: string;
   count?: number;
   description?: string;
+  parent?: number;
 }
 
 export interface ProductAttribute {

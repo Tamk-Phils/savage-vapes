@@ -62,6 +62,48 @@ export async function getCategories(): Promise<ProductCategory[]> {
   return categories.sort((a, b) => (b.count || 0) - (a.count || 0));
 }
 
+export function getCategoryMatchTerms(category: string): string[] {
+  const normalized = category.trim().toLowerCase();
+  const terms = new Set<string>([
+    category,
+    normalized,
+    normalized.replace(/-/g, ' '),
+    normalized.replace(/\s+/g, '-'),
+  ]);
+
+  const { categories } = loadLocalData();
+
+  // Find all category objects matching this slug or name
+  const matched = categories.filter(
+    (c) =>
+      c.slug.toLowerCase() === normalized ||
+      c.name.toLowerCase() === normalized ||
+      c.slug.toLowerCase() === normalized.replace(/\s+/g, '-') ||
+      c.name.toLowerCase() === normalized.replace(/-/g, ' ')
+  );
+
+  function collectChildren(catId: number) {
+    const children = categories.filter((c) => c.parent === catId);
+    children.forEach((ch) => {
+      terms.add(ch.slug);
+      terms.add(ch.slug.toLowerCase());
+      terms.add(ch.name);
+      terms.add(ch.name.toLowerCase());
+      collectChildren(ch.id);
+    });
+  }
+
+  matched.forEach((m) => {
+    terms.add(m.slug);
+    terms.add(m.slug.toLowerCase());
+    terms.add(m.name);
+    terms.add(m.name.toLowerCase());
+    collectChildren(m.id);
+  });
+
+  return Array.from(terms);
+}
+
 export interface ProductQueryOptions {
   category?: string;
   brand?: string;
@@ -98,7 +140,8 @@ export async function getProducts(options: ProductQueryOptions = {}): Promise<{
       let query = supabase.from('products').select('*', { count: 'exact' });
 
       if (category) {
-        query = query.contains('categories', [category]);
+        const catTerms = getCategoryMatchTerms(category);
+        query = query.overlaps('categories', catTerms);
       }
       if (brand) {
         query = query.ilike('brand', `%${brand}%`);
@@ -136,7 +179,7 @@ export async function getProducts(options: ProductQueryOptions = {}): Promise<{
       query = query.range(offset, offset + limit - 1);
 
       const { data, count, error } = await query;
-      if (!error && data) {
+      if (!error && data && data.length > 0) {
         const total = count || data.length;
         return {
           products: data as Product[],
@@ -155,11 +198,14 @@ export async function getProducts(options: ProductQueryOptions = {}): Promise<{
   let filtered = [...products];
 
   if (category) {
-    const catLower = category.toLowerCase().trim();
-    filtered = filtered.filter((p) =>
-      p.categories?.some((c) => c.toLowerCase() === catLower || c.toLowerCase().includes(catLower)) ||
-      p.category_objects?.some((co) => co.slug.toLowerCase() === catLower || co.name.toLowerCase() === catLower)
-    );
+    const catTerms = getCategoryMatchTerms(category).map((t) => t.toLowerCase());
+    filtered = filtered.filter((p) => {
+      const pCats = [
+        ...(p.categories || []).map((c) => c.toLowerCase()),
+        ...(p.category_objects || []).flatMap((co) => [co.slug?.toLowerCase(), co.name?.toLowerCase()]).filter(Boolean) as string[],
+      ];
+      return catTerms.some((t) => pCats.includes(t) || pCats.some((c) => c.includes(t)));
+    });
   }
 
   if (brand) {
