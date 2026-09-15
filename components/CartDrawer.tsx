@@ -10,14 +10,30 @@ import {
   ShoppingBag, 
   ArrowRight, 
   ShieldCheck, 
-  Truck 
+  Truck,
+  AlertCircle,
+  CheckCircle2,
+  Lock
 } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
 
 export default function CartDrawer() {
-  const { isCartOpen, closeCart, items, subtotal, itemCount, updateQuantity, removeItem } = useCart();
+  const { 
+    isCartOpen, 
+    closeCart, 
+    items, 
+    subtotal, 
+    itemCount, 
+    updateQuantity, 
+    removeItem,
+    isMinOrderMet,
+    itemsNeededForMinOrder,
+    minOrderCount
+  } = useCart();
 
   if (!isCartOpen) return null;
+
+  const minOrderProgress = Math.min(100, Math.round((itemCount / minOrderCount) * 100));
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
@@ -46,13 +62,49 @@ export default function CartDrawer() {
           </button>
         </div>
 
-        {/* Discreet Shipping Banner */}
-        <div className="py-2.5 px-4 bg-teal-50/70 border-b border-teal-100 flex items-center justify-between text-xs text-teal-900 font-medium">
-          <div className="flex items-center gap-1.5">
-            <Truck className="w-4 h-4 text-[#2b9685]" />
-            <span>Discreet Australia-wide Courier Delivery</span>
+        {/* Minimum Order Alert & Progress */}
+        {items.length > 0 && (
+          <div className={`py-2.5 px-4 border-b transition-colors ${
+            isMinOrderMet 
+              ? 'bg-emerald-50/80 border-emerald-200 text-emerald-900' 
+              : 'bg-amber-50/90 border-amber-200 text-amber-900'
+          }`}>
+            <div className="flex items-center justify-between text-xs font-semibold mb-1.5">
+              <span className="flex items-center gap-1.5">
+                {isMinOrderMet ? (
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
+                ) : (
+                  <AlertCircle className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
+                )}
+                <span>
+                  {isMinOrderMet
+                    ? `Minimum order requirement met (${itemCount} products)`
+                    : `Minimum Order: 5 Products (${itemCount}/5)`}
+                </span>
+              </span>
+              <span className="text-[11px] font-bold">
+                {isMinOrderMet ? 'Unlocked' : `Add ${itemsNeededForMinOrder} more`}
+              </span>
+            </div>
+            {/* Progress Bar */}
+            <div className="w-full h-1.5 bg-gray-200/80 rounded-full overflow-hidden">
+              <div
+                className={`h-full transition-all duration-300 ${
+                  isMinOrderMet ? 'bg-emerald-500' : 'bg-amber-500'
+                }`}
+                style={{ width: `${minOrderProgress}%` }}
+              />
+            </div>
           </div>
-          <span className="text-[11px] font-bold text-[#0f766e]">Tracked</span>
+        )}
+
+        {/* Discreet Shipping Banner */}
+        <div className="py-2 px-4 bg-teal-50/50 border-b border-teal-100 flex items-center justify-between text-[11px] text-teal-900 font-medium">
+          <div className="flex items-center gap-1.5">
+            <Truck className="w-3.5 h-3.5 text-[#2b9685]" />
+            <span>Discreet Express AU Post Satchel</span>
+          </div>
+          <span className="text-[10px] font-bold text-[#0f766e]">Tracked</span>
         </div>
 
         {/* Cart Items List */}
@@ -176,14 +228,25 @@ export default function CartDrawer() {
               >
                 View Cart
               </Link>
-              <Link
-                href="/checkout"
-                onClick={closeCart}
-                className="w-full py-3 px-4 rounded-xl text-center text-xs font-bold uppercase tracking-wider text-black bg-[#45cab4] hover:bg-[#37b19d] flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95"
-              >
-                <span>Checkout</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+              {isMinOrderMet ? (
+                <Link
+                  href="/checkout"
+                  onClick={closeCart}
+                  className="w-full py-3 px-4 rounded-xl text-center text-xs font-bold uppercase tracking-wider text-black bg-[#45cab4] hover:bg-[#37b19d] flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95"
+                >
+                  <span>Checkout</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              ) : (
+                <Link
+                  href="/shop"
+                  onClick={closeCart}
+                  className="w-full py-3 px-4 rounded-xl text-center text-xs font-bold uppercase tracking-wider text-amber-950 bg-amber-300 hover:bg-amber-400 flex items-center justify-center gap-1.5 transition-all shadow-xs"
+                >
+                  <Lock className="w-3.5 h-3.5" />
+                  <span>Add {itemsNeededForMinOrder} More</span>
+                </Link>
+              )}
             </div>
           </div>
         )}

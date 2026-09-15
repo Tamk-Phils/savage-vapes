@@ -11,12 +11,25 @@ import {
   ShieldCheck, 
   Truck, 
   RotateCcw,
-  Sparkles
+  Sparkles,
+  AlertCircle,
+  CheckCircle2,
+  Lock
 } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
 
 export default function CartPage() {
-  const { items, subtotal, itemCount, updateQuantity, removeItem, clearCart } = useCart();
+  const { 
+    items, 
+    subtotal, 
+    itemCount, 
+    updateQuantity, 
+    removeItem, 
+    clearCart,
+    isMinOrderMet,
+    itemsNeededForMinOrder,
+    minOrderCount
+  } = useCart();
   const [couponCode, setCouponCode] = useState('');
   const [couponApplied, setCouponApplied] = useState(false);
   const [couponError, setCouponError] = useState('');
@@ -253,14 +266,63 @@ export default function CartPage() {
                 )}
               </form>
 
+              {/* Minimum Order Warning & Progress */}
+              <div className={`p-4 rounded-xl border ${
+                isMinOrderMet 
+                  ? 'bg-emerald-50/80 border-emerald-200 text-emerald-900' 
+                  : 'bg-amber-50/90 border-amber-200 text-amber-900'
+              }`}>
+                <div className="flex items-center justify-between text-xs font-bold mb-2">
+                  <span className="flex items-center gap-1.5">
+                    {isMinOrderMet ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                    ) : (
+                      <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                    )}
+                    <span>
+                      {isMinOrderMet
+                        ? `Minimum order threshold met (${itemCount} items)`
+                        : `Minimum Order: 5 Products (${itemCount}/5)`}
+                    </span>
+                  </span>
+                  <span className="text-[11px] font-extrabold uppercase tracking-wider">
+                    {isMinOrderMet ? 'Ready' : `Add ${itemsNeededForMinOrder} more`}
+                  </span>
+                </div>
+                {/* Progress bar */}
+                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full transition-all duration-300 ${
+                      isMinOrderMet ? 'bg-emerald-500' : 'bg-amber-500'
+                    }`}
+                    style={{ width: `${Math.min(100, Math.round((itemCount / minOrderCount) * 100))}%` }}
+                  />
+                </div>
+                {!isMinOrderMet && (
+                  <p className="text-[11px] text-amber-800 mt-2 leading-relaxed">
+                    A minimum of 5 products is required to complete an order. You can mix and match any flavors and brands.
+                  </p>
+                )}
+              </div>
+
               {/* Checkout CTA */}
-              <Link
-                href="/checkout"
-                className="w-full py-4 px-6 rounded-full bg-[#45cab4] hover:bg-[#37b19d] text-black text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md active:scale-95"
-              >
-                <span>Proceed to Checkout</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+              {isMinOrderMet ? (
+                <Link
+                  href="/checkout"
+                  className="w-full py-4 px-6 rounded-full bg-[#45cab4] hover:bg-[#37b19d] text-black text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md active:scale-95"
+                >
+                  <span>Proceed to Checkout</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              ) : (
+                <Link
+                  href="/shop"
+                  className="w-full py-4 px-6 rounded-full bg-amber-300 hover:bg-amber-400 text-amber-950 text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-sm"
+                >
+                  <Lock className="w-4 h-4" />
+                  <span>Add {itemsNeededForMinOrder} More Item{itemsNeededForMinOrder > 1 ? 's' : ''} to Checkout</span>
+                </Link>
+              )}
 
               {/* Guarantee badges */}
               <div className="pt-2 space-y-2 text-xs text-gray-500">

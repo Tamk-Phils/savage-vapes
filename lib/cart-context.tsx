@@ -19,10 +19,14 @@ interface CartContextType {
   toggleCart: () => void;
   freeShippingThreshold: number;
   amountUntilFreeShipping: number;
+  minOrderCount: number;
+  isMinOrderMet: boolean;
+  itemsNeededForMinOrder: number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+export const MIN_ORDER_COUNT = 5;
 const FREE_SHIPPING_THRESHOLD = 150;
 const STANDARD_SHIPPING_FEE = 15;
 
@@ -109,6 +113,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const shippingFee = subtotal >= FREE_SHIPPING_THRESHOLD || subtotal === 0 ? 0 : STANDARD_SHIPPING_FEE;
   const total = subtotal + shippingFee;
   const amountUntilFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+  const isMinOrderMet = itemCount >= MIN_ORDER_COUNT;
+  const itemsNeededForMinOrder = Math.max(0, MIN_ORDER_COUNT - itemCount);
 
   return (
     <CartContext.Provider
@@ -128,6 +134,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         toggleCart: () => setIsCartOpen((prev) => !prev),
         freeShippingThreshold: FREE_SHIPPING_THRESHOLD,
         amountUntilFreeShipping: Math.round(amountUntilFreeShipping * 100) / 100,
+        minOrderCount: MIN_ORDER_COUNT,
+        isMinOrderMet,
+        itemsNeededForMinOrder,
       }}
     >
       {children}

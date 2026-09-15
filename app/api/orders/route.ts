@@ -14,6 +14,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const totalQuantity = (body.items || []).reduce(
+      (sum: number, item: any) => sum + (Number(item.quantity) || 0),
+      0
+    );
+
+    if (totalQuantity < 5) {
+      return NextResponse.json(
+        { error: `Minimum order requirement is 5 products. Your order contains ${totalQuantity} product(s).` },
+        { status: 400 }
+      );
+    }
+
     const result = await saveOrder(body);
 
     if (result.success) {

@@ -17,7 +17,8 @@ import {
   X,
   Eye,
   EyeOff,
-  BookOpen
+  BookOpen,
+  MessageSquare
 } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -140,9 +141,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const navItems = [
     { label: 'Overview', href: '/admin', icon: LayoutDashboard },
+    { label: 'Live Chat (Support)', href: '/admin/chats', icon: MessageSquare },
+    { label: 'Orders', href: '/admin/orders', icon: ShoppingCart },
     { label: 'Products (2,172)', href: '/admin/products', icon: Package },
     { label: 'Blog Posts (25)', href: '/admin/posts', icon: BookOpen },
-    { label: 'Orders', href: '/admin/orders', icon: ShoppingCart },
     { label: 'Categories (89)', href: '/admin/categories', icon: FolderTree },
     { label: 'Store Settings', href: '/admin/settings', icon: Settings },
   ];

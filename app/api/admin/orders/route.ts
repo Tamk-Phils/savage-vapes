@@ -26,8 +26,6 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-export const PATCH = PUT;
-
 export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -41,3 +39,4 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
+

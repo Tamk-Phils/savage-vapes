@@ -254,3 +254,81 @@ export async function sendAdminOrderAlertEmail(order: Order): Promise<{ success:
   }
 }
 
+/**
+ * Send admin instant email alert for customer live chat message
+ */
+export async function sendAdminChatAlertEmail({
+  user,
+  message,
+  threadId,
+}: {
+  user: { name: string; email: string; phone?: string };
+  message: string;
+  threadId: string;
+}): Promise<{ success: boolean; messageId?: string; error?: string }> {
+  const transporter = getTransporter();
+  if (!transporter) {
+    console.warn('⚠️ SpaceMail SMTP not configured: Missing SMTP_USER or SMTP_PASS in environment.');
+    return { success: false, error: 'SMTP credentials not configured' };
+  }
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; padding: 20px; color: #1e293b;">
+        <div style="max-width: 580px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+          <div style="background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%); padding: 24px; text-align: center; color: #ffffff;">
+            <div style="font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">💬 Customer Live Chat Alert</div>
+            <div style="font-size: 13px; opacity: 0.9; margin-top: 4px;">Vape Well Australia Customer Support</div>
+          </div>
+
+          <div style="padding: 24px;">
+            <p style="font-size: 14px; color: #475569; margin-top: 0;">
+              A signed-in customer has sent a message via the live chat widget:
+            </p>
+
+            <div style="background-color: #f0fdfa; border: 1px solid #ccfbf1; border-radius: 12px; padding: 16px; margin: 16px 0;">
+              <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #0d9488; margin-bottom: 6px;">Customer Details:</div>
+              <div style="font-size: 14px; line-height: 1.6; color: #0f172a;">
+                Name: <strong>${user.name}</strong><br>
+                Email: <a href="mailto:${user.email}" style="color: #0d9488;">${user.email}</a><br>
+                ${user.phone ? `Phone: <a href="tel:${user.phone}" style="color: #0d9488;">${user.phone}</a><br>` : ''}
+                Thread ID: <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 12px;">${threadId}</code>
+              </div>
+            </div>
+
+            <div style="background-color: #ffffff; border: 2px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 16px 0;">
+              <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #64748b; margin-bottom: 8px;">Message Content:</div>
+              <div style="font-size: 15px; color: #1e293b; line-height: 1.6; font-style: italic; background: #f8fafc; padding: 12px; border-radius: 8px; border-left: 4px solid #0d9488;">
+                &ldquo;${message}&rdquo;
+              </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 24px;">
+              <a href="https://vapewellaustralia.com/admin/chats?thread=${threadId}" style="display: inline-block; background-color: #0d9488; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 9999px; font-weight: 700; font-size: 13px; letter-spacing: 0.5px; text-transform: uppercase;">
+                Open & Reply in Admin Portal →
+              </a>
+            </div>
+          </div>
+
+          <div style="background-color: #f1f5f9; padding: 14px 24px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0;">
+            Sent automatically via SpaceMail SMTP • Vape Well Australia Live Support
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+
+  try {
+    const info = await transporter.sendMail({
+      from: SMTP_FROM,
+      to: ADMIN_EMAIL,
+      subject: `[LIVE CHAT ALERT] Message from ${user.name} (${user.email})`,
+      html,
+    });
+    return { success: true, messageId: info.messageId };
+  } catch (err: any) {
+    console.error('Failed to send admin live chat alert email:', err);
+    return { success: false, error: err.message };
+  }
+}

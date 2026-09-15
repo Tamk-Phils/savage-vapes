@@ -21,7 +21,15 @@ import { InlineSpinner } from '@/components/LoadingSpinner';
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, subtotal, clearCart } = useCart();
+  const { 
+    items, 
+    subtotal, 
+    clearCart,
+    itemCount,
+    isMinOrderMet,
+    itemsNeededForMinOrder,
+    minOrderCount
+  } = useCart();
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -86,6 +94,11 @@ export default function CheckoutPage() {
 
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isMinOrderMet) {
+      setErrorMsg(`Minimum order requirement is ${minOrderCount} products. Your cart currently has ${itemCount} items. Please add ${itemsNeededForMinOrder} more item(s) to complete your order.`);
+      return;
+    }
 
     if (!ageConfirmed) {
       setErrorMsg('You must declare that you are 18 years of age or older to purchase.');
@@ -220,6 +233,28 @@ export default function CheckoutPage() {
         <form onSubmit={handleSubmitOrder} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left Column: Form Fields */}
           <div className="lg:col-span-7 space-y-6">
+            {!isMinOrderMet && (
+              <div className="p-5 rounded-2xl bg-amber-50 border border-amber-300 text-amber-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-amber-900">
+                      Minimum Order Notice (5 Products Required)
+                    </h3>
+                    <p className="text-xs text-amber-800 mt-1">
+                      Our store has a minimum order requirement of 5 products. Your cart currently contains <strong>{itemCount} product{itemCount === 1 ? '' : 's'}</strong>. Please add <strong>{itemsNeededForMinOrder} more item{itemsNeededForMinOrder === 1 ? '' : 's'}</strong> to place your order.
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  href="/shop"
+                  className="px-4 py-2 rounded-xl bg-amber-200 hover:bg-amber-300 text-amber-950 text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-colors flex-shrink-0"
+                >
+                  Browse Shop →
+                </Link>
+              </div>
+            )}
+
             {/* Customer Contact */}
             <div className="p-6 sm:p-8 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-4">
               <h2 className="text-base font-bold text-gray-900 border-b border-gray-100 pb-3">
@@ -684,23 +719,33 @@ export default function CheckoutPage() {
               </div>
 
               {/* Place Order CTA */}
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full py-4 px-6 rounded-full bg-[#45cab4] hover:bg-[#37b19d] text-black text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-              >
-                {isSubmitting ? (
-                  <div className="flex items-center gap-2">
-                    <InlineSpinner className="w-4 h-4 text-black" />
-                    <span>Processing Order...</span>
-                  </div>
-                ) : (
-                  <>
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span>Place Order (${finalTotal.toFixed(2)} AUD)</span>
-                  </>
-                )}
-              </button>
+              {isMinOrderMet ? (
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-4 px-6 rounded-full bg-[#45cab4] hover:bg-[#37b19d] text-black text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  {isSubmitting ? (
+                    <div className="flex items-center gap-2">
+                      <InlineSpinner className="w-4 h-4 text-black" />
+                      <span>Processing Order...</span>
+                    </div>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Place Order (${finalTotal.toFixed(2)} AUD)</span>
+                    </>
+                  )}
+                </button>
+              ) : (
+                <Link
+                  href="/shop"
+                  className="w-full py-4 px-6 rounded-full bg-amber-300 hover:bg-amber-400 text-amber-950 text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-sm text-center"
+                >
+                  <Lock className="w-4 h-4" />
+                  <span>Add {itemsNeededForMinOrder} More Item{itemsNeededForMinOrder > 1 ? 's' : ''} to Order</span>
+                </Link>
+              )}
 
               <div className="pt-2 space-y-2 text-[11px] text-gray-500">
                 <p className="flex items-center gap-1.5">
