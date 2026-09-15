@@ -7,12 +7,11 @@ export default function AdminSettingsPage() {
   const [saved, setSaved] = useState(false);
   const [settings, setSettings] = useState({
     siteName: 'Vape Well Australia',
-    freeShippingThreshold: 150,
     standardShippingFee: 15,
     expressShippingFee: 22,
     supportEmail: 'support@vapewellaustralia.com.au',
     supportPhone: '1300 000 000',
-    bannerText: 'FREE EXPRESS SHIPPING on Australian orders over $150 | 100% Authentic Guaranteed',
+    bannerText: 'EXPRESS DISPATCH AUSTRALIA-WIDE | 100% Authentic Guaranteed',
   });
 
   const handleSave = (e: React.FormEvent) => {
@@ -42,16 +41,7 @@ export default function AdminSettingsPage() {
           <h2 className="text-xs font-bold uppercase tracking-wider text-gray-700 border-b border-gray-100 pb-3">
             Australian Shipping Rates
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-gray-700">Free Shipping Threshold ($ AUD)</label>
-              <input
-                type="number"
-                value={settings.freeShippingThreshold}
-                onChange={(e) => setSettings({ ...settings, freeShippingThreshold: Number(e.target.value) })}
-                className="w-full bg-white border border-gray-300 rounded-xl px-3.5 py-2.5 text-xs text-gray-900 focus:border-[#45cab4] focus:outline-none"
-              />
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="text-xs font-semibold text-gray-700">Standard Shipping Fee ($ AUD)</label>
               <input

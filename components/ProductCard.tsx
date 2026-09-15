@@ -90,13 +90,13 @@ export default function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
 
-        {/* Rounded Pill Add to Cart Button matching Astra Elementor Button */}
+        {/* Rounded Pill Add to Cart Button */}
         <button
           onClick={handleAddToCart}
-          className={`mt-auto w-full py-2.5 px-4 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-1.5 active:scale-95 ${
+          className={`mt-auto w-full py-2.5 px-4 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer shadow-2xs ${
             added
-              ? 'bg-[#3a3a3a] text-white'
-              : 'bg-[#45cab4] hover:bg-[#3a3a3a] text-black hover:text-white'
+              ? 'bg-emerald-600 text-white'
+              : 'bg-[#0d9488] hover:bg-[#0f766e] text-white shadow-sm hover:shadow'
           }`}
           aria-label={`Add ${product.name} to cart`}
         >

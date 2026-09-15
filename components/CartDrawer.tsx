@@ -17,24 +17,7 @@ import { useCart } from '@/lib/cart-context';
 export default function CartDrawer() {
   const { isCartOpen, closeCart, items, subtotal, itemCount, updateQuantity, removeItem } = useCart();
 
-  const freeShippingThreshold = 150;
-  const amountUntilFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
-
-  // Prevent background scrolling when cart drawer is active
-  useEffect(() => {
-    if (isCartOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isCartOpen]);
-
   if (!isCartOpen) return null;
-
-  const progressPercent = Math.min(100, (subtotal / freeShippingThreshold) * 100);
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
@@ -63,30 +46,13 @@ export default function CartDrawer() {
           </button>
         </div>
 
-        {/* Free Shipping Progress Bar */}
-        <div className="p-4 bg-gray-50 border-b border-gray-100">
-          <div className="flex items-center justify-between text-xs font-semibold mb-1.5">
-            <div className="flex items-center gap-1.5 text-gray-700">
-              <Truck className="w-4 h-4 text-[#2b9685]" />
-              {amountUntilFreeShipping > 0 ? (
-                <span>
-                  Add <strong className="text-[#2b9685] font-bold">${amountUntilFreeShipping.toFixed(2)}</strong> for Free Express Delivery
-                </span>
-              ) : (
-                <span className="text-emerald-700 font-bold">
-                  🎉 You unlocked FREE Express AU Shipping!
-                </span>
-              )}
-            </div>
-            <span className="text-gray-500">{Math.round(progressPercent)}%</span>
+        {/* Discreet Shipping Banner */}
+        <div className="py-2.5 px-4 bg-teal-50/70 border-b border-teal-100 flex items-center justify-between text-xs text-teal-900 font-medium">
+          <div className="flex items-center gap-1.5">
+            <Truck className="w-4 h-4 text-[#2b9685]" />
+            <span>Discreet Australia-wide Courier Delivery</span>
           </div>
-
-          <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-[#45cab4] transition-all duration-300 rounded-full"
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
+          <span className="text-[11px] font-bold text-[#0f766e]">Tracked</span>
         </div>
 
         {/* Cart Items List */}

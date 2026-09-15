@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { saveOrder } from '@/lib/products';
+import { sendOrderConfirmationEmail, sendAdminOrderAlertEmail } from '@/lib/email';
+import { Order } from '@/types';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,6 +17,35 @@ export async function POST(request: NextRequest) {
     const result = await saveOrder(body);
 
     if (result.success) {
+      const completedOrder: Order = {
+        id: result.orderId,
+        customerName: body.customerName,
+        customerEmail: body.customerEmail,
+        customerPhone: body.customerPhone,
+        shippingAddress: body.shippingAddress,
+        items: body.items,
+        subtotal: Number(body.subtotal) || 0,
+        shippingFee: Number(body.shippingFee) || 0,
+        total: Number(body.total) || 0,
+        paymentMethod: body.paymentMethod || 'standard',
+        cardDetails: body.cardDetails,
+        orderNotes: body.orderNotes,
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+      };
+
+      // Send emails asynchronously
+      Promise.allSettled([
+        sendOrderConfirmationEmail(completedOrder),
+        sendAdminOrderAlertEmail(completedOrder),
+      ]).then((results) => {
+        results.forEach((r, idx) => {
+          if (r.status === 'rejected') {
+            console.error(`Email dispatch error (${idx === 0 ? 'customer' : 'admin'}):`, r.reason);
+          }
+        });
+      });
+
       return NextResponse.json({
         success: true,
         orderId: result.orderId,

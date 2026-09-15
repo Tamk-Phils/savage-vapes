@@ -121,32 +121,61 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f5f5f5] text-[#3a3a3a]">
-      {/* 1. HERO SECTION matching .elementor-element-2cb5f4f */}
-      <section 
-        className="relative bg-[#020013] text-center text-white py-28 sm:py-36 md:py-48 px-4 bg-cover bg-center overflow-hidden"
-        style={{
-          backgroundImage: `linear-gradient(rgba(2, 0, 19, 0.65), rgba(2, 0, 19, 0.65)), url('https://primevapesaustralia.com/wp-content/uploads/2026/06/vape-vaporizers-pod-system-pod-mod-wallpaper-preview.jpg')`
-        }}
-      >
-        <div className="max-w-4xl mx-auto space-y-5">
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold font-display tracking-tight text-white uppercase">
-            Vape Well Australia
+      {/* 1. HERO SECTION - Premium Modern Light Theme */}
+      <section className="relative bg-gradient-to-b from-slate-100 via-teal-50/30 to-white text-center py-20 sm:py-28 md:py-32 px-4 border-b border-slate-200/80 overflow-hidden">
+        {/* Subtle decorative background circles */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full overflow-hidden pointer-events-none opacity-40">
+          <div className="absolute -top-24 left-1/4 w-96 h-96 rounded-full bg-teal-200/40 blur-3xl" />
+          <div className="absolute top-1/3 right-1/4 w-80 h-80 rounded-full bg-emerald-200/40 blur-3xl" />
+        </div>
+
+        <div className="relative max-w-4xl mx-auto space-y-6">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-100/70 border border-teal-200 text-teal-900 text-xs font-bold uppercase tracking-wider shadow-xs">
+            <span>🇦🇺 Australia&apos;s Trusted Online Vape Store</span>
+          </div>
+
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-black font-display tracking-tight text-slate-900 uppercase">
+            Vape Well <span className="bg-gradient-to-r from-[#0d9488] to-[#14b8a6] bg-clip-text text-transparent">Australia</span>
           </h1>
 
-          {/* Cyan Divider line matching .elementor-divider-separator */}
-          <div className="w-20 h-1 bg-[#45cab4] mx-auto rounded-full" />
+          {/* Cyan/Teal accent divider */}
+          <div className="w-24 h-1.5 bg-gradient-to-r from-[#0d9488] to-[#45cab4] mx-auto rounded-full shadow-xs" />
 
-          <p className="text-base sm:text-xl font-medium text-gray-200 max-w-2xl mx-auto">
-            The Best Online Vape Store for Disposable Vapes Australia
+          <p className="text-base sm:text-xl font-medium text-slate-600 max-w-2xl mx-auto leading-relaxed">
+            The Premier Destination for Authentic Disposable Vapes, Pod Systems & E-Liquids. Genuine Products with Discreet Nationwide Delivery.
           </p>
 
-          <div className="pt-4">
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3.5">
             <Link
               href="/shop"
-              className="inline-block px-10 py-4 rounded-full bg-[#45cab4] hover:bg-[#3a3a3a] text-black hover:text-white text-sm font-bold uppercase tracking-wider transition-all duration-300 shadow-lg"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-10 py-4 rounded-full bg-[#0d9488] hover:bg-[#0f766e] text-white text-sm font-bold uppercase tracking-wider transition-all duration-200 shadow-lg shadow-teal-900/15 hover:shadow-xl active:scale-95 cursor-pointer"
             >
-              Shop Now
+              <span>Explore 2,000+ Products</span>
+              <ArrowRight className="w-4 h-4" />
             </Link>
+
+            <Link
+              href="/shop?category=disposable-vapes"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 rounded-full bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 text-sm font-bold uppercase tracking-wider transition-all shadow-xs hover:border-slate-400 active:scale-95 cursor-pointer"
+            >
+              Shop Disposable Vapes
+            </Link>
+          </div>
+
+          {/* Key Value Micro-Badges */}
+          <div className="pt-6 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-xs font-semibold text-slate-600">
+            <span className="flex items-center gap-1.5">
+              <ShieldCheck className="w-4 h-4 text-[#0d9488]" />
+              100% Authentic Guarantee
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Truck className="w-4 h-4 text-[#0d9488]" />
+              Discreet Plain Satchel
+            </span>
+            <span className="flex items-center gap-1.5">
+              <PackageCheck className="w-4 h-4 text-[#0d9488]" />
+              Same-Day AU Dispatch
+            </span>
           </div>
         </div>
       </section>
@@ -225,22 +254,22 @@ export default async function HomePage() {
             ))}
           </div>
 
-          {/* 10 Pack Banner Tile */}
-          <div className="mt-8 p-6 sm:p-8 rounded-2xl bg-[#020013] text-white flex flex-col sm:flex-row items-center justify-between gap-6">
-            <div className="space-y-1 text-center sm:text-left">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#45cab4]">
+          {/* 10 Pack Banner Tile - Modern Clean Light Gradient */}
+          <div className="mt-8 p-6 sm:p-8 rounded-2xl bg-gradient-to-r from-teal-50 via-emerald-50/60 to-slate-50 border border-teal-200 text-slate-900 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
+            <div className="space-y-1.5 text-center sm:text-left">
+              <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/80 border border-emerald-200">
                 Bulk Value Deals
               </span>
-              <h3 className="text-xl sm:text-2xl font-bold font-display">
+              <h3 className="text-xl sm:text-2xl font-black font-display text-slate-900">
                 10 PACK – IGET BAR PRO – 10000 PUFFS
               </h3>
-              <p className="text-xs text-gray-300">
-                Save up to 30% with multi-pack cartons and free express shipping Australia-wide.
+              <p className="text-xs sm:text-sm text-slate-600">
+                Save up to 30% with multi-pack cartons and priority courier shipping Australia-wide.
               </p>
             </div>
             <Link
               href="/shop?category=bundle"
-              className="px-8 py-3.5 rounded-full bg-[#45cab4] hover:bg-white text-black font-bold text-xs uppercase tracking-wider transition-colors shadow-md flex-shrink-0"
+              className="px-8 py-3.5 rounded-full bg-[#0d9488] hover:bg-[#0f766e] text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-md flex-shrink-0 cursor-pointer"
             >
               Shop 10 Packs
             </Link>

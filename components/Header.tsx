@@ -76,20 +76,20 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-40 w-full bg-white text-[#3a3a3a] border-b border-gray-200 shadow-sm transition-all">
-      {/* Top Announcement Bar */}
-      <div className="w-full bg-[#020013] text-[11px] sm:text-xs text-gray-300 py-1.5 px-4 border-b border-black">
+      {/* Top Announcement Bar - Clean Light Theme */}
+      <div className="w-full bg-[#f0fdfa] text-[11px] sm:text-xs text-teal-950 py-2 px-4 border-b border-teal-200/60 shadow-xs">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2 font-medium">
-            <span className="inline-flex items-center gap-1 text-[#45cab4] font-bold">
+            <span className="inline-flex items-center gap-1.5 text-[#0d9488] font-bold tracking-wide">
               <Truck className="w-3.5 h-3.5" />
-              <span>FREE EXPRESS SHIPPING</span>
+              <span>EXPRESS DISPATCH AUSTRALIA-WIDE</span>
             </span>
-            <span className="hidden sm:inline text-gray-300">on Australian orders over $150</span>
+            <span className="hidden sm:inline text-teal-800/80 font-normal">| Same-day dispatch before 2:00 PM</span>
           </div>
           <div className="flex items-center gap-4 text-[11px]">
-            <span className="inline-flex items-center gap-1 text-gray-300">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#45cab4]" />
-              <span>100% Authentic Disposable Vapes</span>
+            <span className="inline-flex items-center gap-1.5 text-teal-800/90 font-medium">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#0d9488]" />
+              <span>100% Authentic Guaranteed</span>
             </span>
           </div>
         </div>

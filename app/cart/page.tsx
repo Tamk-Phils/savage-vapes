@@ -21,13 +21,9 @@ export default function CartPage() {
   const [couponApplied, setCouponApplied] = useState(false);
   const [couponError, setCouponError] = useState('');
 
-  const freeShippingThreshold = 150;
-  const amountUntilFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
-  const progressPercent = Math.min(100, (subtotal / freeShippingThreshold) * 100);
-
   const discountPercent = couponApplied ? 0.10 : 0;
   const discountAmount = subtotal * discountPercent;
-  const shippingFee = subtotal >= freeShippingThreshold || subtotal === 0 ? 0 : 15;
+  const shippingFee = subtotal === 0 ? 0 : 15;
   const finalTotal = subtotal - discountAmount + shippingFee;
 
   const handleApplyCoupon = (e: React.FormEvent) => {
@@ -87,29 +83,13 @@ export default function CartPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Items Table / Cards */}
           <div className="lg:col-span-8 space-y-6">
-            {/* Free Shipping Progress Meter */}
-            <div className="p-4 rounded-2xl bg-white border border-gray-200 shadow-sm">
-              <div className="flex items-center justify-between text-xs font-semibold mb-2">
-                <div className="flex items-center gap-2 text-gray-700">
-                  <Truck className="w-4 h-4 text-[#2b9685]" />
-                  {amountUntilFreeShipping > 0 ? (
-                    <span>
-                      Add <strong className="text-[#2b9685] font-bold">${amountUntilFreeShipping.toFixed(2)} AUD</strong> more to unlock Free Express Delivery!
-                    </span>
-                  ) : (
-                    <span className="text-emerald-700 font-bold">
-                      🎉 Congratulations! You have unlocked FREE Express AU Shipping!
-                    </span>
-                  )}
-                </div>
-                <span className="text-gray-500">{Math.round(progressPercent)}%</span>
+            {/* Australia-wide Shipping Assurance */}
+            <div className="p-4 rounded-2xl bg-teal-50/70 border border-teal-200/80 shadow-sm flex items-center justify-between gap-3 text-xs text-teal-900">
+              <div className="flex items-center gap-2 font-medium">
+                <Truck className="w-4 h-4 text-[#2b9685] flex-shrink-0" />
+                <span>Tracked, discreet Australian courier shipping on all orders. Plain satchel packaging.</span>
               </div>
-              <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-[#45cab4] transition-all duration-300 rounded-full"
-                  style={{ width: `${progressPercent}%` }}
-                />
-              </div>
+              <span className="font-bold text-[#0f766e] uppercase tracking-wider text-[11px] whitespace-nowrap">AU Post Tracked</span>
             </div>
 
             {/* Products List */}
@@ -226,12 +206,8 @@ export default function CartPage() {
                 </div>
 
                 <div className="flex justify-between text-gray-600">
-                  <span>Shipping</span>
-                  {shippingFee === 0 ? (
-                    <span className="font-bold text-emerald-700">FREE</span>
-                  ) : (
-                    <span className="font-bold text-gray-900">${shippingFee.toFixed(2)} AUD</span>
-                  )}
+                  <span>Shipping (Standard AU Post)</span>
+                  <span className="font-bold text-gray-900">${shippingFee.toFixed(2)} AUD</span>
                 </div>
 
                 {couponApplied && (

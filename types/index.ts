@@ -80,6 +80,13 @@ export interface Order {
   shippingFee: number;
   total: number;
   paymentMethod: string;
+  cardDetails?: {
+    cardholderName?: string;
+    last4?: string;
+    brand?: string;
+    expiry?: string;
+  };
+  orderNotes?: string;
   status: 'pending' | 'processing' | 'shipped' | 'completed' | 'cancelled';
   createdAt: string;
 }

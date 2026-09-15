@@ -49,7 +49,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       setIsAuthenticated(true);
       setErrorMsg('');
     } else {
-      setErrorMsg('Incorrect passcode. Please enter vapewell2026 or admin123');
+      setErrorMsg('Incorrect passcode. Access denied.');
     }
   };
 
@@ -96,7 +96,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     setPasscode(e.target.value);
                     if (errorMsg) setErrorMsg('');
                   }}
-                  placeholder="Enter passcode (vapewell2026)"
+                  placeholder="Enter administrator passcode"
                   className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 pr-10 text-sm text-gray-900 placeholder-gray-400 focus:border-[#45cab4] focus:ring-2 focus:ring-[#45cab4]/20 focus:outline-none transition-all"
                 />
                 <button

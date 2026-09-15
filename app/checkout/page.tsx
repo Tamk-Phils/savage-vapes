@@ -12,7 +12,9 @@ import {
   Wallet, 
   ArrowLeft, 
   CheckCircle2, 
-  AlertCircle 
+  AlertCircle,
+  Calendar,
+  User
 } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
 
@@ -32,15 +34,22 @@ export default function CheckoutPage() {
     orderNotes: '',
   });
 
+  // Credit Card / Mastercard details
+  const [cardData, setCardData] = useState({
+    cardholderName: '',
+    cardNumber: '',
+    expiryDate: '',
+    cvv: '',
+  });
+
   const [shippingMethod, setShippingMethod] = useState<'standard' | 'express'>('standard');
   const [paymentMethod, setPaymentMethod] = useState<'payid' | 'card' | 'crypto'>('payid');
   const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  // Shipping fees
-  const freeShippingThreshold = 150;
-  const standardFee = subtotal >= freeShippingThreshold ? 0 : 15;
+  // Fixed flat shipping rates (Free services removed)
+  const standardFee = 15;
   const expressFee = 22;
   const currentShippingFee = shippingMethod === 'express' ? expressFee : standardFee;
   const finalTotal = subtotal + currentShippingFee;
@@ -48,6 +57,30 @@ export default function CheckoutPage() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     if (errorMsg) setErrorMsg('');
+  };
+
+  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/\D/g, '').slice(0, 16);
+    const formatted = raw.replace(/(\d{4})(?=\d)/g, '$1 ');
+    setCardData({ ...cardData, cardNumber: formatted });
+    if (errorMsg) setErrorMsg('');
+  };
+
+  const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let raw = e.target.value.replace(/\D/g, '').slice(0, 4);
+    if (raw.length >= 3) {
+      raw = raw.slice(0, 2) + '/' + raw.slice(2);
+    }
+    setCardData({ ...cardData, expiryDate: raw });
+    if (errorMsg) setErrorMsg('');
+  };
+
+  const getCardBrand = (num: string) => {
+    const clean = num.replace(/\s+/g, '');
+    if (clean.startsWith('4')) return 'Visa';
+    if (/^(5[1-5]|2[2-7])/.test(clean)) return 'Mastercard';
+    if (/^3[47]/.test(clean)) return 'American Express';
+    return 'Card';
   };
 
   const handleSubmitOrder = async (e: React.FormEvent) => {
@@ -61,6 +94,26 @@ export default function CheckoutPage() {
     if (!formData.fullName || !formData.email || !formData.phone || !formData.addressLine1 || !formData.suburb || !formData.postcode) {
       setErrorMsg('Please complete all required address and contact fields.');
       return;
+    }
+
+    if (paymentMethod === 'card') {
+      const cleanCard = cardData.cardNumber.replace(/\s+/g, '');
+      if (!cardData.cardholderName.trim()) {
+        setErrorMsg('Please enter the Cardholder Name as shown on your card.');
+        return;
+      }
+      if (cleanCard.length < 15 || cleanCard.length > 16 || !/^\d+$/.test(cleanCard)) {
+        setErrorMsg('Please enter a valid 15 or 16-digit credit card number.');
+        return;
+      }
+      if (!/^(0[1-9]|1[0-2])\/([0-9]{2})$/.test(cardData.expiryDate)) {
+        setErrorMsg('Please enter a valid expiration date in MM/YY format.');
+        return;
+      }
+      if (!/^\d{3,4}$/.test(cardData.cvv.trim())) {
+        setErrorMsg('Please enter a valid 3 or 4-digit CVV/CVC security code.');
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -94,6 +147,12 @@ export default function CheckoutPage() {
         shippingFee: currentShippingFee,
         total: finalTotal,
         paymentMethod,
+        cardDetails: paymentMethod === 'card' ? {
+          cardholderName: cardData.cardholderName.trim(),
+          last4: cardData.cardNumber.replace(/\s+/g, '').slice(-4),
+          brand: getCardBrand(cardData.cardNumber),
+          expiry: cardData.expiryDate.trim(),
+        } : undefined,
         orderNotes: formData.orderNotes,
       };
 
@@ -326,7 +385,7 @@ export default function CheckoutPage() {
                     </div>
                   </div>
                   <span className="text-sm font-bold text-gray-900">
-                    {standardFee === 0 ? 'FREE' : `$${standardFee.toFixed(2)} AUD`}
+                    ${standardFee.toFixed(2)} AUD
                   </span>
                 </label>
 
@@ -385,27 +444,131 @@ export default function CheckoutPage() {
                   </div>
                 </label>
 
-                <label
-                  onClick={() => setPaymentMethod('card')}
-                  className={`flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all ${
+                {/* Credit / Debit Card (Visa, Mastercard, Amex) */}
+                <div
+                  className={`p-4 rounded-xl border transition-all ${
                     paymentMethod === 'card'
-                      ? 'bg-[#45cab4]/10 border-[#45cab4] text-gray-900'
-                      : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
+                      ? 'bg-[#45cab4]/5 border-[#45cab4]'
+                      : 'bg-white border-gray-200 hover:border-gray-300'
                   }`}
                 >
-                  <div className={`w-4 h-4 mt-1 rounded-full border flex items-center justify-center ${paymentMethod === 'card' ? 'border-[#2b9685]' : 'border-gray-400'}`}>
-                    {paymentMethod === 'card' && <div className="w-2 h-2 rounded-full bg-[#2b9685]" />}
-                  </div>
-                  <div>
-                    <span className="text-sm font-bold flex items-center gap-2 text-gray-900">
-                      <CreditCard className="w-4 h-4 text-[#2b9685]" />
-                      Credit / Debit Card (Visa, Mastercard, Amex)
-                    </span>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Encrypted checkout processed via Australian secure merchant gateway.
-                    </p>
-                  </div>
-                </label>
+                  <label
+                    onClick={() => setPaymentMethod('card')}
+                    className="flex items-start gap-3 cursor-pointer"
+                  >
+                    <div className={`w-4 h-4 mt-1 rounded-full border flex items-center justify-center ${paymentMethod === 'card' ? 'border-[#2b9685]' : 'border-gray-400'}`}>
+                      {paymentMethod === 'card' && <div className="w-2 h-2 rounded-full bg-[#2b9685]" />}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-bold flex items-center gap-2 text-gray-900">
+                          <CreditCard className="w-4 h-4 text-[#2b9685]" />
+                          Credit / Debit Card (Visa & Mastercard)
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="px-2 py-0.5 text-[10px] font-black uppercase rounded bg-blue-50 text-blue-700 border border-blue-200">
+                            VISA
+                          </span>
+                          <span className="px-2 py-0.5 text-[10px] font-black uppercase rounded bg-orange-50 text-orange-700 border border-orange-200">
+                            MC
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Encrypted checkout processed via Australian secure merchant gateway.
+                      </p>
+                    </div>
+                  </label>
+
+                  {/* Interactive Card Details Form */}
+                  {paymentMethod === 'card' && (
+                    <div className="mt-4 pt-4 border-t border-gray-200 space-y-3.5 animate-fade-in">
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5">
+                          <User className="w-3.5 h-3.5 text-gray-400" />
+                          Cardholder Full Name *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={cardData.cardholderName}
+                          onChange={(e) => {
+                            setCardData({ ...cardData, cardholderName: e.target.value });
+                            if (errorMsg) setErrorMsg('');
+                          }}
+                          placeholder="e.g. John Doe"
+                          className="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-[#45cab4] focus:ring-1 focus:ring-[#45cab4] focus:outline-none"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5">
+                            <CreditCard className="w-3.5 h-3.5 text-gray-400" />
+                            Card Number *
+                          </label>
+                          {cardData.cardNumber && (
+                            <span className="text-[11px] font-bold text-[#2b9685]">
+                              {getCardBrand(cardData.cardNumber)}
+                            </span>
+                          )}
+                        </div>
+                        <input
+                          type="text"
+                          required
+                          value={cardData.cardNumber}
+                          onChange={handleCardNumberChange}
+                          placeholder="0000 0000 0000 0000"
+                          maxLength={19}
+                          className="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900 font-mono placeholder-gray-400 focus:border-[#45cab4] focus:ring-1 focus:ring-[#45cab4] focus:outline-none"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5">
+                            <Calendar className="w-3.5 h-3.5 text-gray-400" />
+                            Expiry (MM/YY) *
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={cardData.expiryDate}
+                            onChange={handleExpiryChange}
+                            placeholder="MM/YY"
+                            maxLength={5}
+                            className="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900 font-mono placeholder-gray-400 focus:border-[#45cab4] focus:ring-1 focus:ring-[#45cab4] focus:outline-none"
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5">
+                            <Lock className="w-3.5 h-3.5 text-gray-400" />
+                            CVV / CVC *
+                          </label>
+                          <input
+                            type="password"
+                            required
+                            value={cardData.cvv}
+                            onChange={(e) => {
+                              const clean = e.target.value.replace(/\D/g, '').slice(0, 4);
+                              setCardData({ ...cardData, cvv: clean });
+                              if (errorMsg) setErrorMsg('');
+                            }}
+                            placeholder="123"
+                            maxLength={4}
+                            className="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900 font-mono placeholder-gray-400 focus:border-[#45cab4] focus:ring-1 focus:ring-[#45cab4] focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-1 text-[11px] text-gray-500">
+                        <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                        <span>256-bit encrypted SSL checkout. Card details are processed securely.</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                 <label
                   onClick={() => setPaymentMethod('crypto')}
@@ -505,7 +668,7 @@ export default function CheckoutPage() {
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping ({shippingMethod === 'express' ? 'Express' : 'Standard'})</span>
                   <span className="font-bold text-gray-900">
-                    {currentShippingFee === 0 ? 'FREE' : `$${currentShippingFee.toFixed(2)} AUD`}
+                    ${currentShippingFee.toFixed(2)} AUD
                   </span>
                 </div>
                 <div className="pt-3 border-t border-gray-200 flex justify-between items-baseline">
