@@ -104,3 +104,35 @@ export interface CustomerReview {
   verified: boolean;
 }
 
+export interface BlogPostHeading {
+  id: string;
+  title: string;
+  level: number;
+}
+
+export interface BlogPostAuthor {
+  name: string;
+  role?: string;
+  avatar?: string;
+}
+
+export interface BlogPost {
+  id: number;
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  featuredImage: string;
+  category: string;
+  author: BlogPostAuthor | string;
+  publishedAt: string;
+  readTime: string;
+  headings: BlogPostHeading[];
+  isFeatured: boolean;
+  metaTitle: string;
+  metaDescription: string;
+  keywords: string[];
+  tags: string[];
+}
+
+

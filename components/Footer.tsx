@@ -148,6 +148,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/blog" className="text-slate-600 hover:text-[#0d9488] transition-colors">
+                  Vape Guides & Insights
+                </Link>
+              </li>
+              <li>
                 <Link href="/reviews" className="text-slate-600 hover:text-[#0d9488] transition-colors">
                   Verified Reviews
                 </Link>

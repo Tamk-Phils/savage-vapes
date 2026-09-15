@@ -187,6 +187,9 @@ export default function Header() {
             <Link href="/shop" className="hover:text-[#45cab4] transition-colors">
               Shop
             </Link>
+            <Link href="/blog" className="hover:text-[#45cab4] transition-colors">
+              Vape Guides
+            </Link>
             <Link href="/checkout" className="hover:text-[#45cab4] transition-colors">
               Checkout
             </Link>
@@ -256,6 +259,9 @@ export default function Header() {
           </Link>
           <Link href="/shop" onClick={() => setMobileMenuOpen(false)} className="block py-2 border-b border-gray-100 hover:text-[#45cab4]">
             Shop
+          </Link>
+          <Link href="/blog" onClick={() => setMobileMenuOpen(false)} className="block py-2 border-b border-gray-100 hover:text-[#45cab4]">
+            Vape Guides & Blog
           </Link>
           <Link href="/checkout" onClick={() => setMobileMenuOpen(false)} className="block py-2 border-b border-gray-100 hover:text-[#45cab4]">
             Checkout

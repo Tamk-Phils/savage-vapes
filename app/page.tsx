@@ -21,6 +21,8 @@ import {
   getGeekBarSection,
   getReviews 
 } from '@/lib/products';
+import { getFeaturedPosts } from '@/lib/posts';
+import BlogCard from '@/components/BlogCard';
 
 export default async function HomePage() {
   const [
@@ -40,6 +42,8 @@ export default async function HomePage() {
     getGeekBarSection(4),
     getReviews(),
   ]);
+
+  const featuredPosts = getFeaturedPosts(3);
 
   // 11 Exact Circular Category Tiles from primevapesaustralia.com
   const categoryTiles = [
@@ -524,6 +528,41 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* 14. LATEST VAPE GUIDES & REVIEWS */}
+      {featuredPosts && featuredPosts.length > 0 && (
+        <section className="py-16 px-4 bg-white border-t border-gray-200">
+          <div className="max-w-6xl mx-auto space-y-8">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 text-[#0d9488] text-xs font-bold uppercase tracking-wider">
+                  <Flame className="w-3.5 h-3.5" />
+                  <span>Knowledge & Hardware Insights</span>
+                </div>
+                <h2 className="text-2xl sm:text-4xl font-black text-gray-900 font-display">
+                  Latest Vape Guides & Reviews
+                </h2>
+                <p className="text-sm text-gray-600 max-w-xl">
+                  Read our in-depth device breakdowns, puff-count comparisons, and flavor guides before you buy.
+                </p>
+              </div>
+              <Link
+                href="/blog"
+                className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0d9488] hover:underline"
+              >
+                <span>Explore All 25 Guides</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredPosts.map((post) => (
+                <BlogCard key={post.id} post={post} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
