@@ -134,3 +134,4 @@ export function FullScreenLoader({ text = 'Please wait...' }: { text?: string })
     </div>
   );
 }
+
