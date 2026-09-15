@@ -51,15 +51,16 @@ function writeLocalUsers(users: StoredUser[]): void {
 }
 
 async function loadUsers(): Promise<StoredUser[]> {
-  // 1. Try Supabase Storage first for multi-container synchronization
+  // 1. Try Supabase Storage with anti-cache query
   if (isSupabaseConfigured() && supabase) {
     try {
-      const { data, error } = await supabase.storage.from(STORAGE_BUCKET).download(STORAGE_FILE);
+      const cacheBustKey = `${STORAGE_FILE}?t=${Date.now()}`;
+      const { data, error } = await supabase.storage.from(STORAGE_BUCKET).download(cacheBustKey);
       if (data && !error) {
         const text = await data.text();
         const parsed = JSON.parse(text);
         if (Array.isArray(parsed)) {
-          writeLocalUsers(parsed); // Sync to local disk cache
+          writeLocalUsers(parsed);
           return parsed;
         }
       }
@@ -73,16 +74,20 @@ async function loadUsers(): Promise<StoredUser[]> {
 }
 
 async function saveUsers(users: StoredUser[]): Promise<void> {
-  // Always update local disk cache immediately
   writeLocalUsers(users);
 
-  // Sync to Supabase Storage
+  // Sync to Supabase Storage with cacheControl: '0'
   if (isSupabaseConfigured() && supabase) {
     try {
-      await supabase.storage.from(STORAGE_BUCKET).upload(STORAGE_FILE, Buffer.from(JSON.stringify(users, null, 2)), {
-        upsert: true,
-        contentType: 'application/json',
-      });
+      await supabase.storage.from(STORAGE_BUCKET).upload(
+        STORAGE_FILE,
+        Buffer.from(JSON.stringify(users, null, 2)),
+        {
+          upsert: true,
+          cacheControl: '0',
+          contentType: 'application/json',
+        }
+      );
     } catch (err) {
       console.error('Error uploading users to Supabase Storage:', err);
     }
@@ -159,22 +164,58 @@ export async function registerUser(
     return { success: false, error: 'Password must be at least 6 characters long.' };
   }
 
-  const users = await loadUsers();
-  const existing = users.find((u) => u.email.toLowerCase() === normalizedEmail);
-  if (existing) {
-    return { success: false, error: 'An account with this email address already exists.' };
-  }
-
   const { hash, salt } = hashPassword(password);
   const userId = 'usr_' + crypto.randomBytes(8).toString('hex');
+  const now = new Date().toISOString();
+
   const newUser: User = {
     id: userId,
     name: cleanName,
     email: normalizedEmail,
     phone: phone?.trim() || undefined,
     role: 'customer',
-    createdAt: new Date().toISOString(),
+    createdAt: now,
   };
+
+  // 1. Try PostgreSQL table if available
+  if (isSupabaseConfigured() && supabase) {
+    try {
+      const { data: existingDb } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', normalizedEmail)
+        .maybeSingle();
+
+      if (existingDb) {
+        return { success: false, error: 'An account with this email address already exists.' };
+      }
+
+      const { error: insErr } = await supabase.from('users').insert({
+        id: userId,
+        name: cleanName,
+        email: normalizedEmail,
+        phone: phone?.trim() || null,
+        role: 'customer',
+        password_hash: hash,
+        salt,
+        created_at: now,
+      });
+
+      if (!insErr) {
+        const token = createSessionToken(newUser);
+        return { success: true, user: newUser, token };
+      }
+    } catch (e) {
+      // Fall through to storage
+    }
+  }
+
+  // 2. Storage / Local Fallback
+  const users = await loadUsers();
+  const existing = users.find((u) => u.email.toLowerCase() === normalizedEmail);
+  if (existing) {
+    return { success: false, error: 'An account with this email address already exists.' };
+  }
 
   const storedUser: StoredUser = {
     ...newUser,
@@ -199,6 +240,39 @@ export async function loginUser(
     return { success: false, error: 'Email and password are required.' };
   }
 
+  // 1. Try PostgreSQL table if available
+  if (isSupabaseConfigured() && supabase) {
+    try {
+      const { data: dbUser, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', normalizedEmail)
+        .maybeSingle();
+
+      if (!error && dbUser) {
+        const isValid = verifyPassword(password, dbUser.password_hash, dbUser.salt);
+        if (!isValid) {
+          return { success: false, error: 'Invalid email or password.' };
+        }
+
+        const user: User = {
+          id: dbUser.id,
+          name: dbUser.name,
+          email: dbUser.email,
+          phone: dbUser.phone || undefined,
+          role: dbUser.role || 'customer',
+          createdAt: dbUser.created_at,
+        };
+
+        const token = createSessionToken(user);
+        return { success: true, user, token };
+      }
+    } catch (e) {
+      // Fall through to storage
+    }
+  }
+
+  // 2. Storage / Local Fallback
   const users = await loadUsers();
   const stored = users.find((u) => u.email.toLowerCase() === normalizedEmail);
 
@@ -225,6 +299,31 @@ export async function loginUser(
 }
 
 export async function getUserById(id: string): Promise<User | null> {
+  // 1. Try PostgreSQL table
+  if (isSupabaseConfigured() && supabase) {
+    try {
+      const { data: dbUser, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
+
+      if (!error && dbUser) {
+        return {
+          id: dbUser.id,
+          name: dbUser.name,
+          email: dbUser.email,
+          phone: dbUser.phone || undefined,
+          role: dbUser.role || 'customer',
+          createdAt: dbUser.created_at,
+        };
+      }
+    } catch (e) {
+      // Fall through to storage
+    }
+  }
+
+  // 2. Storage / Local Fallback
   const users = await loadUsers();
   const stored = users.find((u) => u.id === id);
   if (!stored) return null;
