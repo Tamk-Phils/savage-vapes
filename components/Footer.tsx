@@ -1,7 +1,13 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Flame, ShieldAlert, Truck, Lock, RotateCcw, Mail } from 'lucide-react';
 
 export default function Footer() {
+  const pathname = usePathname();
+  if (pathname?.startsWith('/admin')) return null;
+
   return (
     <footer className="bg-slate-50 border-t border-slate-200 text-slate-600">
       {/* 18+ Nicotine Warning Banner - High Contrast Clean Light Warning */}

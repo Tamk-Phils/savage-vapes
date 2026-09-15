@@ -99,7 +99,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     if (errorMsg) setErrorMsg('');
                   }}
                   placeholder="Enter administrator passcode"
-                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 pr-10 text-sm text-gray-900 placeholder-gray-400 focus:border-[#45cab4] focus:ring-2 focus:ring-[#45cab4]/20 focus:outline-none transition-all"
+                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 pr-10 text-base sm:text-sm text-gray-900 placeholder-gray-400 focus:border-[#45cab4] focus:ring-2 focus:ring-[#45cab4]/20 focus:outline-none transition-all"
                 />
                 <button
                   type="button"

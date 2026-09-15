@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 import { 
   MessageSquare, 
   X, 
@@ -19,6 +20,7 @@ import { ChatMessage, ChatThread } from '@/types';
 import { InlineSpinner } from '@/components/LoadingSpinner';
 
 export default function LiveChatWidget() {
+  const pathname = usePathname();
   const { user, openAuthModal } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -28,12 +30,16 @@ export default function LiveChatWidget() {
   const [isLoading, setIsLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
   };
+
+  if (pathname?.startsWith('/admin')) return null;
 
   // Fetch messages from server
   const fetchMessages = async (silent = false) => {
@@ -247,7 +253,7 @@ export default function LiveChatWidget() {
             /* CHAT VIEW: Active authenticated message stream */
             <div className="flex-1 flex flex-col min-h-0 bg-slate-50/40">
               {/* Messages feed */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-3.5">
+              <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3.5">
                 {isLoading && messages.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center space-y-2 text-xs text-slate-400">
                     <InlineSpinner className="w-5 h-5 text-[#0d9488]" />
@@ -306,7 +312,6 @@ export default function LiveChatWidget() {
                     );
                   })
                 )}
-                <div ref={messagesEndRef} />
               </div>
 
               {/* Chat Input Bar */}
@@ -319,7 +324,7 @@ export default function LiveChatWidget() {
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   placeholder="Type your message..."
-                  className="flex-1 bg-slate-50 border border-slate-200 rounded-full px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0d9488] focus:bg-white transition-all shadow-inner"
+                  className="flex-1 bg-slate-50 border border-slate-200 rounded-full px-4 py-2.5 text-base sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0d9488] focus:bg-white transition-all shadow-inner"
                 />
                 <button
                   type="submit"
@@ -341,3 +346,4 @@ export default function LiveChatWidget() {
     </>
   );
 }
+

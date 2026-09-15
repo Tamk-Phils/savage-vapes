@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { CartProvider } from '@/lib/cart-context';
 import { AuthProvider } from '@/lib/auth-context';
@@ -9,6 +9,12 @@ import AgeVerificationModal from '@/components/AgeVerificationModal';
 import AuthModal from '@/components/AuthModal';
 import LiveChatWidget from '@/components/LiveChatWidget';
 import ServiceWorkerCleanup from '@/components/ServiceWorkerCleanup';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+};
 
 export const metadata: Metadata = {
   title: 'Vape Well Australia - Buy Vapes Online Australia | Best Disposable Vape Store',

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { 
   Search, 
   ShoppingBag, 
@@ -24,10 +24,13 @@ import { InlineSpinner } from '@/components/LoadingSpinner';
 
 export default function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const { itemCount, subtotal, openCart } = useCart();
   const { user, openAuthModal, logout } = useAuth();
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const userDropdownRef = useRef<HTMLDivElement>(null);
+
+  if (pathname?.startsWith('/admin')) return null;
   
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Product[]>([]);

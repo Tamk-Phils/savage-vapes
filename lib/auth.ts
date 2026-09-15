@@ -9,28 +9,31 @@ interface StoredUser extends User {
   salt: string;
 }
 
+const STORAGE_BUCKET = 'app-data';
+const STORAGE_FILE = 'users.json';
+
 const AUTH_SECRET = process.env.AUTH_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || 'vapewell-australia-auth-secret-key-2026';
 
-function getUsersFilePath(): string {
+function getLocalUsersFilePath(): string {
   const tmpPath = path.join('/tmp', 'users.json');
   const localPath = path.join(process.cwd(), 'data', 'users.json');
   return fs.existsSync(tmpPath) ? tmpPath : localPath;
 }
 
-function loadUsers(): StoredUser[] {
+function readLocalUsers(): StoredUser[] {
   try {
-    const filePath = getUsersFilePath();
+    const filePath = getLocalUsersFilePath();
     if (fs.existsSync(filePath)) {
       const content = fs.readFileSync(filePath, 'utf-8');
       return JSON.parse(content);
     }
   } catch (err) {
-    console.error('Error loading users:', err);
+    console.error('Error reading local users:', err);
   }
   return [];
 }
 
-function saveUsers(users: StoredUser[]): void {
+function writeLocalUsers(users: StoredUser[]): void {
   const localPath = path.join(process.cwd(), 'data', 'users.json');
   const tmpPath = path.join('/tmp', 'users.json');
 
@@ -43,6 +46,45 @@ function saveUsers(users: StoredUser[]): void {
       fs.writeFileSync(tmpPath, JSON.stringify(users, null, 2), 'utf-8');
     } catch (err) {
       console.error('Error saving users to fallback /tmp:', err);
+    }
+  }
+}
+
+async function loadUsers(): Promise<StoredUser[]> {
+  // 1. Try Supabase Storage first for multi-container synchronization
+  if (isSupabaseConfigured() && supabase) {
+    try {
+      const { data, error } = await supabase.storage.from(STORAGE_BUCKET).download(STORAGE_FILE);
+      if (data && !error) {
+        const text = await data.text();
+        const parsed = JSON.parse(text);
+        if (Array.isArray(parsed)) {
+          writeLocalUsers(parsed); // Sync to local disk cache
+          return parsed;
+        }
+      }
+    } catch (err) {
+      // Fall through to local cache
+    }
+  }
+
+  // 2. Fallback to local cache
+  return readLocalUsers();
+}
+
+async function saveUsers(users: StoredUser[]): Promise<void> {
+  // Always update local disk cache immediately
+  writeLocalUsers(users);
+
+  // Sync to Supabase Storage
+  if (isSupabaseConfigured() && supabase) {
+    try {
+      await supabase.storage.from(STORAGE_BUCKET).upload(STORAGE_FILE, Buffer.from(JSON.stringify(users, null, 2)), {
+        upsert: true,
+        contentType: 'application/json',
+      });
+    } catch (err) {
+      console.error('Error uploading users to Supabase Storage:', err);
     }
   }
 }
@@ -117,7 +159,7 @@ export async function registerUser(
     return { success: false, error: 'Password must be at least 6 characters long.' };
   }
 
-  const users = loadUsers();
+  const users = await loadUsers();
   const existing = users.find((u) => u.email.toLowerCase() === normalizedEmail);
   if (existing) {
     return { success: false, error: 'An account with this email address already exists.' };
@@ -141,22 +183,7 @@ export async function registerUser(
   };
 
   users.push(storedUser);
-  saveUsers(users);
-
-  // Sync to Supabase if configured
-  if (isSupabaseConfigured() && supabase) {
-    try {
-      await supabase.from('users').upsert({
-        id: userId,
-        name: cleanName,
-        email: normalizedEmail,
-        phone: phone?.trim() || null,
-        role: 'customer',
-      });
-    } catch (e) {
-      console.warn('Supabase user sync error:', e);
-    }
-  }
+  await saveUsers(users);
 
   const token = createSessionToken(newUser);
   return { success: true, user: newUser, token };
@@ -172,7 +199,7 @@ export async function loginUser(
     return { success: false, error: 'Email and password are required.' };
   }
 
-  const users = loadUsers();
+  const users = await loadUsers();
   const stored = users.find((u) => u.email.toLowerCase() === normalizedEmail);
 
   if (!stored) {
@@ -198,7 +225,7 @@ export async function loginUser(
 }
 
 export async function getUserById(id: string): Promise<User | null> {
-  const users = loadUsers();
+  const users = await loadUsers();
   const stored = users.find((u) => u.id === id);
   if (!stored) return null;
 

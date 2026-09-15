@@ -9,26 +9,29 @@ interface StoredChatData {
   messages: ChatMessage[];
 }
 
-function getChatFilePath(): string {
+const STORAGE_BUCKET = 'app-data';
+const STORAGE_FILE = 'chats.json';
+
+function getLocalChatFilePath(): string {
   const tmpPath = path.join('/tmp', 'chats.json');
   const localPath = path.join(process.cwd(), 'data', 'chats.json');
   return fs.existsSync(tmpPath) ? tmpPath : localPath;
 }
 
-function loadChatData(): StoredChatData {
+function readLocalChatData(): StoredChatData {
   try {
-    const filePath = getChatFilePath();
+    const filePath = getLocalChatFilePath();
     if (fs.existsSync(filePath)) {
       const content = fs.readFileSync(filePath, 'utf-8');
       return JSON.parse(content);
     }
   } catch (err) {
-    console.error('Error loading chat data:', err);
+    console.error('Error reading local chat data:', err);
   }
   return { threads: [], messages: [] };
 }
 
-function saveChatData(data: StoredChatData): void {
+function writeLocalChatData(data: StoredChatData): void {
   const localPath = path.join(process.cwd(), 'data', 'chats.json');
   const tmpPath = path.join('/tmp', 'chats.json');
 
@@ -45,9 +48,50 @@ function saveChatData(data: StoredChatData): void {
   }
 }
 
+async function loadChatData(): Promise<StoredChatData> {
+  // 1. Try Supabase Storage first for shared multi-container persistence
+  if (isSupabaseConfigured() && supabase) {
+    try {
+      const { data, error } = await supabase.storage.from(STORAGE_BUCKET).download(STORAGE_FILE);
+      if (data && !error) {
+        const text = await data.text();
+        const parsed: StoredChatData = JSON.parse(text);
+        if (Array.isArray(parsed.threads) && Array.isArray(parsed.messages)) {
+          writeLocalChatData(parsed); // Sync to local cache
+          return parsed;
+        }
+      }
+    } catch (err) {
+      // Fall through to local cache
+    }
+  }
+
+  // 2. Fallback to local cache
+  return readLocalChatData();
+}
+
+async function saveChatData(data: StoredChatData): Promise<void> {
+  // Always update local disk cache immediately
+  writeLocalChatData(data);
+
+  // Sync to Supabase Storage so all serverless lambdas share the exact same state
+  if (isSupabaseConfigured() && supabase) {
+    try {
+      await supabase.storage.from(STORAGE_BUCKET).upload(STORAGE_FILE, Buffer.from(JSON.stringify(data, null, 2)), {
+        upsert: true,
+        contentType: 'application/json',
+      });
+    } catch (err) {
+      console.error('Error uploading chat data to Supabase Storage:', err);
+    }
+  }
+}
+
 export async function getOrCreateThread(user: User): Promise<ChatThread> {
-  const data = loadChatData();
-  let thread = data.threads.find((t) => t.userId === user.id || t.userEmail.toLowerCase() === user.email.toLowerCase());
+  const data = await loadChatData();
+  let thread = data.threads.find(
+    (t) => t.userId === user.id || t.userEmail.toLowerCase() === user.email.toLowerCase()
+  );
 
   if (!thread) {
     const threadId = 'th_' + crypto.randomBytes(8).toString('hex');
@@ -78,24 +122,14 @@ export async function getOrCreateThread(user: User): Promise<ChatThread> {
     };
     data.messages.push(welcomeMsg);
 
-    saveChatData(data);
-
-    // Attempt Supabase insert
-    if (isSupabaseConfigured() && supabase) {
-      try {
-        await supabase.from('chat_threads').upsert(thread);
-        await supabase.from('chat_messages').insert(welcomeMsg);
-      } catch (e) {
-        // Ignored
-      }
-    }
+    await saveChatData(data);
   }
 
   return thread;
 }
 
 export async function getThreadMessages(threadId: string): Promise<ChatMessage[]> {
-  const data = loadChatData();
+  const data = await loadChatData();
   return data.messages
     .filter((m) => m.threadId === threadId)
     .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
@@ -111,7 +145,7 @@ export async function sendUserMessage(
   }
 
   const thread = await getOrCreateThread(user);
-  const data = loadChatData();
+  const data = await loadChatData();
 
   const msgId = 'msg_' + crypto.randomBytes(8).toString('hex');
   const now = new Date().toISOString();
@@ -137,19 +171,7 @@ export async function sendUserMessage(
     data.threads[threadIdx].status = 'active';
   }
 
-  saveChatData(data);
-
-  // Sync to Supabase if configured
-  if (isSupabaseConfigured() && supabase) {
-    try {
-      await supabase.from('chat_messages').insert(newMsg);
-      if (threadIdx > -1) {
-        await supabase.from('chat_threads').upsert(data.threads[threadIdx]);
-      }
-    } catch (e) {
-      // Graceful fallback
-    }
-  }
+  await saveChatData(data);
 
   return {
     success: true,
@@ -168,7 +190,7 @@ export async function sendAdminReply(
     throw new Error('Reply cannot be empty');
   }
 
-  const data = loadChatData();
+  const data = await loadChatData();
   const threadIdx = data.threads.findIndex((t) => t.id === threadId);
   if (threadIdx === -1) {
     throw new Error('Chat thread not found');
@@ -194,30 +216,20 @@ export async function sendAdminReply(
   data.threads[threadIdx].unreadByUserCount = (data.threads[threadIdx].unreadByUserCount || 0) + 1;
   data.threads[threadIdx].unreadByAdminCount = 0; // Admin replied
 
-  saveChatData(data);
-
-  // Sync to Supabase if configured
-  if (isSupabaseConfigured() && supabase) {
-    try {
-      await supabase.from('chat_messages').insert(replyMsg);
-      await supabase.from('chat_threads').upsert(data.threads[threadIdx]);
-    } catch (e) {
-      // Graceful fallback
-    }
-  }
+  await saveChatData(data);
 
   return { success: true, message: replyMsg };
 }
 
 export async function getAllThreads(): Promise<ChatThread[]> {
-  const data = loadChatData();
+  const data = await loadChatData();
   return data.threads.sort(
     (a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime()
   );
 }
 
 export async function markThreadRead(threadId: string, by: 'admin' | 'user'): Promise<void> {
-  const data = loadChatData();
+  const data = await loadChatData();
   const threadIdx = data.threads.findIndex((t) => t.id === threadId);
   if (threadIdx > -1) {
     if (by === 'admin') {
@@ -235,5 +247,5 @@ export async function markThreadRead(threadId: string, by: 'admin' | 'user'): Pr
     }
   });
 
-  saveChatData(data);
+  await saveChatData(data);
 }

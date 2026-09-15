@@ -13,7 +13,8 @@ import {
   CheckCheck,
   RefreshCw,
   Sparkles,
-  ExternalLink
+  ExternalLink,
+  ArrowLeft
 } from 'lucide-react';
 import { ChatMessage, ChatThread } from '@/types';
 import LoadingSpinner, { InlineSpinner } from '@/components/LoadingSpinner';
@@ -29,11 +30,14 @@ export default function AdminChatsPage() {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [isSending, setIsSending] = useState(false);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const prevMsgCountRef = useRef<number>(0);
   const pollTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
   };
 
   // Fetch threads
@@ -43,10 +47,17 @@ export default function AdminChatsPage() {
       const res = await fetch('/api/admin/chats');
       if (res.ok) {
         const data = await res.json();
-        setThreads(data.threads || []);
-        // Auto-select first thread if none selected
-        if (!selectedThreadId && data.threads && data.threads.length > 0) {
-          setSelectedThreadId(data.threads[0].id);
+        const incomingThreads: ChatThread[] = data.threads || [];
+        setThreads(incomingThreads);
+
+        // Auto-select first thread on desktop only if none selected
+        if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
+          setSelectedThreadId((prev) => {
+            if (!prev && incomingThreads.length > 0) {
+              return incomingThreads[0].id;
+            }
+            return prev;
+          });
         }
       }
     } catch (err) {
@@ -64,7 +75,7 @@ export default function AdminChatsPage() {
       if (res.ok) {
         const data = await res.json();
         setMessages(data.messages || []);
-        // Also update local thread unread count
+        // Update local thread unread count
         setThreads((prev) =>
           prev.map((t) => (t.id === threadId ? { ...t, unreadByAdminCount: 0 } : t))
         );
@@ -78,7 +89,6 @@ export default function AdminChatsPage() {
 
   // Initial load
   useEffect(() => {
-    // Check if ?thread=... is in query string
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const urlThreadId = params.get('thread');
@@ -92,6 +102,7 @@ export default function AdminChatsPage() {
   // When selected thread changes
   useEffect(() => {
     if (selectedThreadId) {
+      prevMsgCountRef.current = 0;
       fetchMessages(selectedThreadId);
     } else {
       setMessages([]);
@@ -112,9 +123,12 @@ export default function AdminChatsPage() {
     };
   }, [selectedThreadId]);
 
-  // Scroll to bottom when messages update
+  // Scroll to bottom when message count changes
   useEffect(() => {
-    scrollToBottom();
+    if (messages.length !== prevMsgCountRef.current) {
+      scrollToBottom();
+      prevMsgCountRef.current = messages.length;
+    }
   }, [messages]);
 
   const handleSendReply = async (e?: React.FormEvent) => {
@@ -184,21 +198,21 @@ export default function AdminChatsPage() {
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Page Title */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-4 sm:space-y-6 max-w-full overflow-x-hidden">
+      {/* Page Title Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <MessageSquare className="w-7 h-7 text-[#0d9488]" />
-            Live Chat & Support Inbox
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <MessageSquare className="w-6 h-6 sm:w-7 sm:h-7 text-[#0d9488]" />
+            <span>Live Chat Support</span>
             {totalUnread > 0 && (
               <span className="ml-2 px-2.5 py-0.5 rounded-full bg-red-500 text-white text-xs font-bold shadow-sm">
                 {totalUnread} new
               </span>
             )}
           </h1>
-          <p className="text-xs text-gray-500 mt-1">
-            Real-time conversations with signed-in customers. Instant email alerts are dispatched via SpaceMail SMTP.
+          <p className="text-xs text-gray-500 mt-0.5">
+            Real-time customer inbox. All conversations are synced to Supabase Cloud Storage.
           </p>
         </div>
 
@@ -214,19 +228,24 @@ export default function AdminChatsPage() {
         </button>
       </div>
 
-      {/* Main Two-Column Layout */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[640px] max-h-[750px]">
-        {/* Left Column: Threads Sidebar */}
-        <div className="lg:col-span-4 border-r border-gray-200 flex flex-col bg-slate-50/40">
-          {/* Search & Tabs */}
-          <div className="p-3.5 border-b border-gray-200 space-y-2.5 bg-white">
+      {/* Main Two-Column / Mobile-Switching Box */}
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col lg:grid lg:grid-cols-12 h-[calc(100vh-160px)] min-h-[560px] max-h-[780px] w-full">
+        
+        {/* Left Column: Threads Sidebar (Shown when no thread selected on mobile, or always on desktop) */}
+        <div
+          className={`${
+            selectedThreadId ? 'hidden lg:flex' : 'flex'
+          } lg:col-span-4 border-r border-gray-200 flex-col bg-slate-50/40 h-full min-h-0`}
+        >
+          {/* Search & Filter Tabs */}
+          <div className="p-3 sm:p-3.5 border-b border-gray-200 space-y-2.5 bg-white flex-shrink-0">
             <div className="relative">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search customers or messages..."
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0d9488] focus:bg-white transition-all"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-3 py-2 text-base sm:text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0d9488] focus:bg-white transition-all"
               />
               <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
             </div>
@@ -288,9 +307,9 @@ export default function AdminChatsPage() {
                     onClick={() => setSelectedThreadId(t.id)}
                     className={`w-full text-left p-3.5 transition-colors flex items-start gap-3 cursor-pointer ${
                       isSelected
-                        ? 'bg-teal-50/70 border-l-4 border-l-[#0d9488]'
+                        ? 'bg-teal-50/80 border-l-4 border-l-[#0d9488]'
                         : hasUnread
-                        ? 'bg-amber-50/40 hover:bg-slate-100'
+                        ? 'bg-amber-50/50 hover:bg-slate-100'
                         : 'hover:bg-slate-100/80'
                     }`}
                   >
@@ -325,33 +344,49 @@ export default function AdminChatsPage() {
           </div>
         </div>
 
-        {/* Right Column: Active Conversation */}
-        <div className="lg:col-span-8 flex flex-col bg-white">
+        {/* Right Column: Active Conversation (Shown when thread selected on mobile, or always on desktop) */}
+        <div
+          className={`${
+            selectedThreadId ? 'flex' : 'hidden lg:flex'
+          } lg:col-span-8 flex-col bg-white h-full min-h-0`}
+        >
           {selectedThread ? (
             <>
               {/* Conversation Header */}
-              <div className="p-4 border-b border-gray-200 flex flex-wrap items-center justify-between gap-3 bg-white">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#0d9488] text-white flex items-center justify-center font-bold text-sm shadow-xs">
+              <div className="p-3 sm:p-4 border-b border-gray-200 flex items-center justify-between gap-2 sm:gap-3 bg-white flex-shrink-0">
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                  {/* Mobile Back Button */}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedThreadId(null)}
+                    className="p-1.5 -ml-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1 cursor-pointer lg:hidden flex-shrink-0"
+                    aria-label="Back to threads"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    <span className="text-xs">Inbox</span>
+                  </button>
+
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#0d9488] text-white flex items-center justify-center font-bold text-sm shadow-xs flex-shrink-0">
                     {selectedThread.userName.charAt(0).toUpperCase()}
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h2 className="text-sm font-bold text-slate-900">{selectedThread.userName}</h2>
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-wider">
-                        Signed In Customer
+
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <h2 className="text-xs sm:text-sm font-bold text-slate-900 truncate">
+                        {selectedThread.userName}
+                      </h2>
+                      <span className="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 text-[9px] font-bold uppercase tracking-wider hidden sm:inline-block">
+                        Signed In
                       </span>
                     </div>
-                    <div className="flex items-center gap-3 text-xs text-slate-500 mt-0.5">
-                      <span className="flex items-center gap-1">
-                        <Mail className="w-3 h-3 text-slate-400" />
-                        <a href={`mailto:${selectedThread.userEmail}`} className="hover:text-[#0d9488]">
-                          {selectedThread.userEmail}
-                        </a>
-                      </span>
+
+                    <div className="flex items-center gap-2 text-[11px] text-slate-500 truncate mt-0.5">
+                      <a href={`mailto:${selectedThread.userEmail}`} className="hover:text-[#0d9488] truncate">
+                        {selectedThread.userEmail}
+                      </a>
                       {selectedThread.userPhone && (
-                        <span className="flex items-center gap-1">
-                          <Phone className="w-3 h-3 text-slate-400" />
+                        <span className="hidden sm:inline-flex items-center gap-1">
+                          •
                           <a href={`tel:${selectedThread.userPhone}`} className="hover:text-[#0d9488]">
                             {selectedThread.userPhone}
                           </a>
@@ -361,17 +396,20 @@ export default function AdminChatsPage() {
                   </div>
                 </div>
 
-                <div className="text-right">
-                  <span className="text-[11px] text-slate-400 block">Thread ID</span>
+                <div className="text-right flex-shrink-0">
+                  <span className="text-[10px] text-slate-400 block sm:inline mr-1">ID</span>
                   <code className="text-[10px] font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">
-                    {selectedThread.id}
+                    {selectedThread.id.slice(0, 8)}
                   </code>
                 </div>
               </div>
 
-              {/* Messages Feed */}
-              <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-slate-50/50">
-                {loadingMessages ? (
+              {/* Messages Feed (Container-isolated scrolling) */}
+              <div
+                ref={messagesContainerRef}
+                className="flex-1 overflow-y-auto p-3.5 sm:p-5 space-y-4 bg-slate-50/50 min-h-0"
+              >
+                {loadingMessages && messages.length === 0 ? (
                   <div className="h-full flex items-center justify-center text-xs text-slate-400">
                     <InlineSpinner className="w-5 h-5 text-[#0d9488]" />
                   </div>
@@ -408,7 +446,7 @@ export default function AdminChatsPage() {
                         </span>
 
                         <div
-                          className={`max-w-[80%] px-4 py-3 rounded-2xl text-xs sm:text-sm leading-relaxed ${
+                          className={`max-w-[85%] sm:max-w-[75%] px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-2xl text-xs sm:text-sm leading-relaxed ${
                             isStaff
                               ? 'bg-[#0d9488] text-white rounded-br-xs shadow-xs'
                               : 'bg-white text-slate-900 border border-slate-200 rounded-bl-xs shadow-xs'
@@ -429,11 +467,10 @@ export default function AdminChatsPage() {
                     );
                   })
                 )}
-                <div ref={messagesEndRef} />
               </div>
 
               {/* Quick Canned Responses */}
-              <div className="px-4 py-2 bg-white border-t border-gray-100 flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+              <div className="px-3 sm:px-4 py-2 bg-white border-t border-gray-100 flex items-center gap-1.5 overflow-x-auto touch-pan-x scrollbar-none flex-shrink-0">
                 <Sparkles className="w-3.5 h-3.5 text-[#0d9488] flex-shrink-0" />
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex-shrink-0">
                   Quick Reply:
@@ -443,26 +480,26 @@ export default function AdminChatsPage() {
                     key={idx}
                     type="button"
                     onClick={() => setReplyText(qr)}
-                    className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-teal-50 hover:text-[#0d9488] text-[11px] text-slate-600 whitespace-nowrap transition-colors cursor-pointer"
+                    className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-teal-50 hover:text-[#0d9488] text-[11px] text-slate-600 whitespace-nowrap transition-colors cursor-pointer flex-shrink-0"
                   >
-                    {qr.slice(0, 32)}...
+                    {qr.slice(0, 28)}...
                   </button>
                 ))}
               </div>
 
               {/* Reply Input Box */}
-              <form onSubmit={handleSendReply} className="p-3.5 bg-white border-t border-gray-200 flex gap-2">
+              <form onSubmit={handleSendReply} className="p-2.5 sm:p-3.5 bg-white border-t border-gray-200 flex gap-2 flex-shrink-0">
                 <input
                   type="text"
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
-                  placeholder={`Reply to ${selectedThread.userName.split(' ')[0]} as Vape Well Support...`}
-                  className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0d9488] focus:bg-white transition-all shadow-inner"
+                  placeholder={`Reply to ${selectedThread.userName.split(' ')[0]}...`}
+                  className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 sm:py-3 text-base sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0d9488] focus:bg-white transition-all shadow-inner"
                 />
                 <button
                   type="submit"
                   disabled={!replyText.trim() || isSending}
-                  className="px-5 py-3 rounded-xl bg-[#0d9488] hover:bg-[#0f766e] text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-sm active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  className="px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-[#0d9488] hover:bg-[#0f766e] text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-sm active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex-shrink-0"
                 >
                   {isSending ? (
                     <InlineSpinner className="w-4 h-4 text-white" />
@@ -480,7 +517,7 @@ export default function AdminChatsPage() {
               <MessageSquare className="w-12 h-12 text-slate-200" />
               <h3 className="text-sm font-bold text-slate-700">No Conversation Selected</h3>
               <p className="text-xs text-slate-500 max-w-xs">
-                Select a customer conversation from the list to view the full chat history and reply.
+                Select a customer conversation from the inbox list to view the message history and reply.
               </p>
             </div>
           )}
