@@ -35,9 +35,9 @@ export default function AdminSettingsPage() {
         </p>
       </div>
 
-      <form onSubmit={handleSave} className="space-y-6">
+      <form onSubmit={handleSave} className="space-y-4 sm:space-y-6">
         {/* Shipping Rates */}
-        <div className="p-6 sm:p-8 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-4">
+        <div className="p-4 sm:p-6 sm:p-8 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-4">
           <h2 className="text-xs font-bold uppercase tracking-wider text-gray-700 border-b border-gray-100 pb-3">
             Australian Shipping Rates
           </h2>
@@ -64,7 +64,7 @@ export default function AdminSettingsPage() {
         </div>
 
         {/* Announcement Banner & Contact */}
-        <div className="p-6 sm:p-8 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-4">
+        <div className="p-4 sm:p-6 sm:p-8 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-4">
           <h2 className="text-xs font-bold uppercase tracking-wider text-gray-700 border-b border-gray-100 pb-3">
             Store Contact & Announcement
           </h2>
@@ -103,7 +103,7 @@ export default function AdminSettingsPage() {
         </div>
 
         {/* Database & Data Sync */}
-        <div className="p-6 sm:p-8 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-4">
+        <div className="p-4 sm:p-6 sm:p-8 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-4">
           <h2 className="text-xs font-bold uppercase tracking-wider text-gray-700 border-b border-gray-100 pb-3 flex items-center gap-2">
             <Database className="w-4 h-4 text-[#2b9685]" />
             Database & Data Sync
@@ -116,7 +116,7 @@ export default function AdminSettingsPage() {
             <button
               type="button"
               onClick={handleDownloadBackup}
-              className="px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold uppercase tracking-wider border border-gray-300 flex items-center gap-2 transition-colors cursor-pointer"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold uppercase tracking-wider border border-gray-300 flex items-center justify-center gap-2 transition-colors cursor-pointer"
             >
               <Download className="w-4 h-4" />
               <span>Export Orders JSON</span>
@@ -124,7 +124,7 @@ export default function AdminSettingsPage() {
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3">
+        <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-2">
           {saved && (
             <span className="text-xs text-emerald-700 font-semibold flex items-center gap-1">
               <ShieldCheck className="w-4 h-4" />
@@ -133,7 +133,7 @@ export default function AdminSettingsPage() {
           )}
           <button
             type="submit"
-            className="px-8 py-3.5 rounded-xl bg-[#45cab4] hover:bg-[#37b19d] text-black text-xs font-bold uppercase tracking-wider transition-all shadow-sm active:scale-95 flex items-center gap-2 cursor-pointer"
+            className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-[#45cab4] hover:bg-[#37b19d] text-black text-xs font-bold uppercase tracking-wider transition-all shadow-sm active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
           >
             <Save className="w-4 h-4" />
             <span>Save Settings</span>

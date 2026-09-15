@@ -66,14 +66,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center p-4">
-        <div className="max-w-md w-full p-8 rounded-2xl bg-white border border-gray-200 shadow-xl text-center space-y-6">
-          <div className="w-16 h-16 rounded-2xl bg-[#45cab4]/15 border border-[#45cab4]/30 text-[#2b9685] flex items-center justify-center mx-auto shadow-sm">
-            <Lock className="w-8 h-8" />
+      <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center p-3 sm:p-4">
+        <div className="max-w-md w-full p-5 sm:p-8 rounded-2xl bg-white border border-gray-200 shadow-xl text-center space-y-6">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#45cab4]/15 border border-[#45cab4]/30 text-[#2b9685] flex items-center justify-center mx-auto shadow-sm">
+            <Lock className="w-7 h-7 sm:w-8 sm:h-8" />
           </div>
 
           <div className="space-y-1.5">
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
               Vape Well Admin Portal
             </h1>
             <p className="text-xs text-gray-500">
@@ -146,24 +146,34 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   ];
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-gray-800 flex flex-col md:flex-row">
-      {/* Mobile Top Bar */}
-      <div className="md:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shadow-sm">
+    <div className="min-h-screen bg-[#f8fafc] text-gray-800 flex flex-col md:flex-row overflow-x-clip">
+      {/* Mobile Sticky Top Bar */}
+      <div className="sticky top-0 z-30 md:hidden bg-white/95 backdrop-blur-md border-b border-gray-200 px-4 py-3 flex items-center justify-between shadow-xs">
         <div className="flex items-center gap-2">
           <Flame className="w-6 h-6 text-[#45cab4]" />
-          <span className="font-bold text-gray-900 text-sm">VAPE WELL ADMIN</span>
+          <span className="font-black text-gray-900 text-sm tracking-tight">VAPE WELL ADMIN</span>
         </div>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-1.5 text-gray-600 hover:text-gray-900"
+          className="p-1.5 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+          aria-label="Toggle menu"
         >
           {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
+      {/* Mobile Drawer Backdrop Overlay */}
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 md:hidden transition-opacity"
+          aria-hidden="true"
+        />
+      )}
+
       {/* Sidebar Navigation */}
       <aside
-        className={`fixed md:sticky top-0 left-0 z-40 w-64 bg-white border-r border-gray-200 h-screen flex flex-col justify-between p-5 transition-transform duration-200 shadow-sm md:translate-x-0 ${
+        className={`fixed md:sticky top-0 left-0 z-50 md:z-auto w-64 bg-white border-r border-gray-200 h-screen flex flex-col justify-between p-5 transition-transform duration-200 shadow-xl md:shadow-none md:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
@@ -229,7 +239,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Main Admin Content View */}
-      <main className="flex-1 p-4 sm:p-8 lg:p-10 max-w-7xl mx-auto w-full">
+      <main className="flex-1 min-w-0 w-full overflow-x-clip p-3.5 sm:p-6 lg:p-8 max-w-7xl mx-auto">
         {children}
       </main>
     </div>

@@ -15,6 +15,7 @@ import {
   DollarSign
 } from 'lucide-react';
 import { Product } from '@/types';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -254,89 +255,153 @@ export default function AdminProductsPage() {
         </div>
       </div>
 
-      {/* Products Table */}
+      {/* Products Table Container */}
       <div className="rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-[#45cab4]">
-            <div className="w-8 h-8 border-2 border-[#45cab4] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-            <span className="text-xs text-gray-500">Loading products...</span>
+          <div className="py-20 text-center">
+            <LoadingSpinner size="lg" text="Loading catalog products..." />
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-gray-700">
-              <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider text-[10px] border-b border-gray-200">
-                <tr>
-                  <th className="p-3.5 rounded-l-lg">Product</th>
-                  <th className="p-3.5">Brand</th>
-                  <th className="p-3.5">Price (AUD)</th>
-                  <th className="p-3.5">Stock Status</th>
-                  <th className="p-3.5">On Sale</th>
-                  <th className="p-3.5 text-right rounded-r-lg">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {products.map((p) => (
-                  <tr key={p.id} className="hover:bg-gray-50/75 transition-colors">
-                    <td className="p-3.5 flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-200 p-1 flex-shrink-0 flex items-center justify-center">
-                        <img
-                          src={p.images?.[0]?.src || '/placeholder-vape.jpg'}
-                          alt={p.name}
-                          className="w-full h-full object-contain"
-                        />
+          <>
+            {/* Mobile Touch-Friendly Product Cards (< sm) */}
+            <div className="block sm:hidden divide-y divide-gray-100">
+              {products.map((p) => (
+                <div key={p.id} className="p-3.5 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-14 h-14 rounded-xl bg-gray-50 border border-gray-200 p-1 flex-shrink-0 flex items-center justify-center">
+                      <img
+                        src={p.images?.[0]?.src || '/placeholder-vape.jpg'}
+                        alt={p.name}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <span className="text-[11px] font-bold text-[#2b9685] block">{p.brand}</span>
+                      <h3 className="text-xs font-bold text-gray-900 line-clamp-2 leading-snug">{p.name}</h3>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs font-black text-gray-900">${p.price.toFixed(2)} AUD</span>
+                        {p.on_sale && (
+                          <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                            SALE
+                          </span>
+                        )}
                       </div>
-                      <div className="min-w-0 max-w-sm">
-                        <span className="font-semibold text-gray-900 block truncate">{p.name}</span>
-                        <span className="text-[10px] text-gray-400 font-mono">ID: {p.id}</span>
-                      </div>
-                    </td>
-                    <td className="p-3.5 font-bold text-[#2b9685]">{p.brand}</td>
-                    <td className="p-3.5 font-bold text-gray-900">${p.price.toFixed(2)}</td>
-                    <td className="p-3.5">
-                      <button
-                        onClick={() => handleToggleStock(p)}
-                        className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
-                          p.is_in_stock
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            : 'bg-red-50 text-red-700 border border-red-200'
-                        }`}
-                      >
-                        {p.is_in_stock ? '● In Stock' : '✕ Out of Stock'}
-                      </button>
-                    </td>
-                    <td className="p-3.5">
-                      {p.on_sale ? (
-                        <span className="text-emerald-700 font-bold">Yes</span>
-                      ) : (
-                        <span className="text-gray-400">No</span>
-                      )}
-                    </td>
-                    <td className="p-3.5 text-right space-x-2">
+                    </div>
+                  </div>
+
+                  {/* Mobile Card Bottom Controls */}
+                  <div className="flex items-center justify-between pt-1 border-t border-gray-50">
+                    <button
+                      onClick={() => handleToggleStock(p)}
+                      className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                        p.is_in_stock
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                          : 'bg-red-50 text-red-700 border border-red-200'
+                      }`}
+                    >
+                      {p.is_in_stock ? '● In Stock' : '✕ Out of Stock'}
+                    </button>
+
+                    <div className="flex items-center gap-2">
                       <button
                         onClick={() => openEditModal(p)}
                         className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors cursor-pointer"
                         title="Edit product"
+                        aria-label="Edit product"
                       >
-                        <Edit3 className="w-3.5 h-3.5" />
+                        <Edit3 className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteProduct(p.id)}
                         className="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-colors cursor-pointer"
                         title="Delete product"
+                        aria-label="Delete product"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
-                    </td>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View (>= sm) */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-left text-xs text-gray-700">
+                <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider text-[10px] border-b border-gray-200">
+                  <tr>
+                    <th className="p-3.5 rounded-l-lg">Product</th>
+                    <th className="p-3.5">Brand</th>
+                    <th className="p-3.5">Price (AUD)</th>
+                    <th className="p-3.5">Stock Status</th>
+                    <th className="p-3.5">On Sale</th>
+                    <th className="p-3.5 text-right rounded-r-lg">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {products.map((p) => (
+                    <tr key={p.id} className="hover:bg-gray-50/75 transition-colors">
+                      <td className="p-3.5 flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-200 p-1 flex-shrink-0 flex items-center justify-center">
+                          <img
+                            src={p.images?.[0]?.src || '/placeholder-vape.jpg'}
+                            alt={p.name}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                        <div className="min-w-0 max-w-sm">
+                          <span className="font-semibold text-gray-900 block truncate">{p.name}</span>
+                          <span className="text-[10px] text-gray-400 font-mono">ID: {p.id}</span>
+                        </div>
+                      </td>
+                      <td className="p-3.5 font-bold text-[#2b9685]">{p.brand}</td>
+                      <td className="p-3.5 font-bold text-gray-900">${p.price.toFixed(2)}</td>
+                      <td className="p-3.5">
+                        <button
+                          onClick={() => handleToggleStock(p)}
+                          className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                            p.is_in_stock
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              : 'bg-red-50 text-red-700 border border-red-200'
+                          }`}
+                        >
+                          {p.is_in_stock ? '● In Stock' : '✕ Out of Stock'}
+                        </button>
+                      </td>
+                      <td className="p-3.5">
+                        {p.on_sale ? (
+                          <span className="text-emerald-700 font-bold">Yes</span>
+                        ) : (
+                          <span className="text-gray-400">No</span>
+                        )}
+                      </td>
+                      <td className="p-3.5 text-right space-x-2">
+                        <button
+                          onClick={() => openEditModal(p)}
+                          className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors cursor-pointer"
+                          title="Edit product"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteProduct(p.id)}
+                          className="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-colors cursor-pointer"
+                          title="Delete product"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
 
         {/* Pagination Bar */}
         {totalPages > 1 && (
-          <div className="p-4 border-t border-gray-200 flex items-center justify-between text-xs bg-gray-50/50">
+          <div className="p-3.5 sm:p-4 border-t border-gray-200 flex flex-col xs:flex-row sm:flex-row items-center justify-between gap-3 text-xs bg-gray-50/50">
             <span className="text-gray-500">
               Page {page} of {totalPages}
             </span>
@@ -362,14 +427,14 @@ export default function AdminProductsPage() {
 
       {/* Add / Edit Product Modal */}
       {(isAddModalOpen || editingProduct) && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="relative w-full max-w-2xl bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/50 backdrop-blur-sm">
+          <div className="relative w-full max-w-2xl bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 sm:p-8 max-h-[92vh] overflow-y-auto shadow-2xl">
             <button
               onClick={() => {
                 setIsAddModalOpen(false);
                 setEditingProduct(null);
               }}
-              className="absolute top-5 right-5 p-1 text-gray-400 hover:text-gray-600 cursor-pointer"
+              className="absolute top-4 right-4 sm:top-5 sm:right-5 p-1 text-gray-400 hover:text-gray-600 cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>

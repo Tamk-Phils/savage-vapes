@@ -17,6 +17,7 @@ import {
   User
 } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
+import { InlineSpinner } from '@/components/LoadingSpinner';
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -690,7 +691,7 @@ export default function CheckoutPage() {
               >
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                    <InlineSpinner className="w-4 h-4 text-black" />
                     <span>Processing Order...</span>
                   </div>
                 ) : (

@@ -121,34 +121,33 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f5f5f5] text-[#3a3a3a]">
-      {/* 1. HERO SECTION - Premium Modern Light Theme */}
-      <section className="relative bg-gradient-to-b from-slate-100 via-teal-50/30 to-white text-center py-20 sm:py-28 md:py-32 px-4 border-b border-slate-200/80 overflow-hidden">
-        {/* Subtle decorative background circles */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full overflow-hidden pointer-events-none opacity-40">
-          <div className="absolute -top-24 left-1/4 w-96 h-96 rounded-full bg-teal-200/40 blur-3xl" />
-          <div className="absolute top-1/3 right-1/4 w-80 h-80 rounded-full bg-emerald-200/40 blur-3xl" />
-        </div>
-
+      {/* 1. HERO SECTION matching primevapesaustralia.com with Authentic Hardware Imagery */}
+      <section 
+        className="relative text-center text-white py-24 sm:py-32 md:py-40 px-4 bg-cover bg-center overflow-hidden border-b border-slate-200/50"
+        style={{
+          backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.68), rgba(15, 23, 42, 0.76)), url('https://primevapesaustralia.com/wp-content/uploads/2026/06/vape-vaporizers-pod-system-pod-mod-wallpaper-preview.jpg')`
+        }}
+      >
         <div className="relative max-w-4xl mx-auto space-y-6">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-100/70 border border-teal-200 text-teal-900 text-xs font-bold uppercase tracking-wider shadow-xs">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#45cab4] text-xs font-bold uppercase tracking-wider shadow-sm">
             <span>🇦🇺 Australia&apos;s Trusted Online Vape Store</span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-black font-display tracking-tight text-slate-900 uppercase">
-            Vape Well <span className="bg-gradient-to-r from-[#0d9488] to-[#14b8a6] bg-clip-text text-transparent">Australia</span>
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-black font-display tracking-tight text-white uppercase drop-shadow-md">
+            Vape Well <span className="text-[#45cab4]">Australia</span>
           </h1>
 
-          {/* Cyan/Teal accent divider */}
-          <div className="w-24 h-1.5 bg-gradient-to-r from-[#0d9488] to-[#45cab4] mx-auto rounded-full shadow-xs" />
+          {/* Cyan/Teal accent divider line */}
+          <div className="w-24 h-1.5 bg-[#45cab4] mx-auto rounded-full shadow-sm" />
 
-          <p className="text-base sm:text-xl font-medium text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            The Premier Destination for Authentic Disposable Vapes, Pod Systems & E-Liquids. Genuine Products with Discreet Nationwide Delivery.
+          <p className="text-base sm:text-xl font-medium text-slate-100 max-w-2xl mx-auto leading-relaxed drop-shadow-sm">
+            The Best Online Vape Store for Disposable Vapes Australia. Genuine Products with Scratch-Off Verification & Discreet Nationwide Delivery.
           </p>
 
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3.5">
             <Link
               href="/shop"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-10 py-4 rounded-full bg-[#0d9488] hover:bg-[#0f766e] text-white text-sm font-bold uppercase tracking-wider transition-all duration-200 shadow-lg shadow-teal-900/15 hover:shadow-xl active:scale-95 cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-10 py-4 rounded-full bg-[#45cab4] hover:bg-[#38b29e] text-black text-sm font-bold uppercase tracking-wider transition-all duration-200 shadow-lg shadow-teal-900/30 hover:shadow-xl active:scale-95 cursor-pointer"
             >
               <span>Explore 2,000+ Products</span>
               <ArrowRight className="w-4 h-4" />
@@ -156,24 +155,24 @@ export default async function HomePage() {
 
             <Link
               href="/shop?category=disposable-vapes"
-              className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 rounded-full bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 text-sm font-bold uppercase tracking-wider transition-all shadow-xs hover:border-slate-400 active:scale-95 cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 rounded-full bg-white/15 hover:bg-white/25 text-white border border-white/30 backdrop-blur-md text-sm font-bold uppercase tracking-wider transition-all shadow-sm active:scale-95 cursor-pointer"
             >
               Shop Disposable Vapes
             </Link>
           </div>
 
           {/* Key Value Micro-Badges */}
-          <div className="pt-6 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-xs font-semibold text-slate-600">
+          <div className="pt-6 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-xs font-semibold text-slate-200">
             <span className="flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-[#0d9488]" />
+              <ShieldCheck className="w-4 h-4 text-[#45cab4]" />
               100% Authentic Guarantee
             </span>
             <span className="flex items-center gap-1.5">
-              <Truck className="w-4 h-4 text-[#0d9488]" />
+              <Truck className="w-4 h-4 text-[#45cab4]" />
               Discreet Plain Satchel
             </span>
             <span className="flex items-center gap-1.5">
-              <PackageCheck className="w-4 h-4 text-[#0d9488]" />
+              <PackageCheck className="w-4 h-4 text-[#45cab4]" />
               Same-Day AU Dispatch
             </span>
           </div>

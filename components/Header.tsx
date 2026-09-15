@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
 import { Product } from '@/types';
+import { InlineSpinner } from '@/components/LoadingSpinner';
 
 export default function Header() {
   const router = useRouter();
@@ -128,7 +129,9 @@ export default function Header() {
               />
               <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               {isSearching && (
-                <div className="w-4 h-4 border-2 border-[#45cab4] border-t-transparent rounded-full animate-spin absolute right-3.5 top-1/2 -translate-y-1/2" />
+                <span className="absolute right-3.5 top-1/2 -translate-y-1/2">
+                  <InlineSpinner className="w-4 h-4 text-[#0d9488]" />
+                </span>
               )}
             </form>
 
